@@ -1,0 +1,2452 @@
+<!-- ... eslint-disable -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Love | Romantic Space</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <script>
+        // Define global authentication & role selection handlers immediately in head scope
+        window.selectLoginProfile = function(role) {
+            window.selectedLoginRole = role;
+            const passcodeBox = document.getElementById('louie-passcode-box');
+            const selectionCards = document.getElementById('profile-selection-cards');
+            
+            if (role === 'louie') {
+                if (selectionCards) selectionCards.classList.add('hidden');
+                if (passcodeBox) passcodeBox.classList.remove('hidden');
+            } else {
+                window.currentUserRole = 'contributor';
+                window.currentUserName = 'Pau';
+                if (typeof window.updateUserRoleUI === 'function') window.updateUserRoleUI();
+                const modal = document.getElementById('user-login-modal');
+                if (modal) modal.classList.add('hidden');
+                
+                const envelopeOverlay = document.getElementById('welcome-envelope-overlay');
+                if (envelopeOverlay) envelopeOverlay.classList.remove('hidden');
+            }
+        };
+
+        window.resetProfileSelection = function() {
+            window.selectedLoginRole = null;
+            const passcodeBox = document.getElementById('louie-passcode-box');
+            const selectionCards = document.getElementById('profile-selection-cards');
+            if (passcodeBox) passcodeBox.classList.add('hidden');
+            if (selectionCards) selectionCards.classList.remove('hidden');
+        };
+
+        window.togglePasswordVisibility = function() {
+            const input = document.getElementById('louie-password-input');
+            const icon = document.getElementById('pass-eye-icon');
+            if (input && input.type === 'password') {
+                input.type = 'text';
+                if (icon) icon.className = 'fa-solid fa-eye-slash';
+            } else if (input) {
+                input.type = 'password';
+                if (icon) icon.className = 'fa-solid fa-eye';
+            }
+        };
+
+        window.submitLouiePassword = function() {
+            const input = document.getElementById('louie-password-input');
+            const err = document.getElementById('louie-pass-error');
+            if (input && input.value.trim() !== '') {
+                window.currentUserRole = 'owner';
+                window.currentUserName = 'Louie';
+                if (typeof window.updateUserRoleUI === 'function') window.updateUserRoleUI();
+                const modal = document.getElementById('user-login-modal');
+                if (modal) modal.classList.add('hidden');
+                
+                const envelopeOverlay = document.getElementById('welcome-envelope-overlay');
+                if (envelopeOverlay) envelopeOverlay.classList.remove('hidden');
+            } else {
+                if (err) err.classList.remove('hidden');
+            }
+        };
+
+        window.openRoleSwitchModal = function() {
+            const modal = document.getElementById('user-login-modal');
+            const selectionCards = document.getElementById('profile-selection-cards');
+            const passcodeBox = document.getElementById('louie-passcode-box');
+            if (selectionCards) selectionCards.classList.remove('hidden');
+            if (passcodeBox) passcodeBox.classList.add('hidden');
+            if (modal) modal.classList.remove('hidden');
+        };
+    </script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                        cursive: ['"Dancing Script"', 'cursive'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS Variables for Dynamic Light & Dark Mode Dual System */
+        :root {
+            --bg-primary: #0b132b;
+            --bg-secondary: #1c2541;
+            --card-bg: rgba(15, 23, 42, 0.75);
+            --card-bg-solid: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-green: #10b981;
+            --accent-green-hover: #059669;
+            --accent-blue: #0ea5e9;
+            --border-color: rgba(52, 211, 153, 0.2);
+            --input-bg: #1e293b;
+            --shadow-color: rgba(0, 0, 0, 0.37);
+            --bubble-1: rgba(16, 185, 129, 0.15);
+            --bubble-2: rgba(14, 165, 233, 0.15);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f0f7f7;
+            --bg-secondary: #e2f1f0;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-bg-solid: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent-green: #0d9488;
+            --accent-green-hover: #0f766e;
+            --accent-blue: #0284c7;
+            --border-color: rgba(13, 148, 136, 0.25);
+            --input-bg: #f1f5f9;
+            --shadow-color: rgba(15, 23, 42, 0.08);
+            --bubble-1: rgba(13, 148, 136, 0.12);
+            --bubble-2: rgba(2, 132, 199, 0.12);
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-green); border-radius: 4px; }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .polaroid-card {
+            background: var(--card-bg-solid);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 12px 35px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .polaroid-card:hover {
+            transform: translateY(-4px) rotate(0.5deg);
+            box-shadow: 0 18px 45px var(--shadow-color);
+        }
+
+        .washi-tape-top {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-1deg);
+            width: 100px;
+            height: 24px;
+            background: rgba(16, 185, 129, 0.22);
+            backdrop-filter: blur(4px);
+            border: 1px dashed rgba(16, 185, 129, 0.4);
+            z-index: 10;
+        }
+
+        .wax-seal {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d9488, #047857);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .themed-input {
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .themed-text-secondary {
+            color: var(--text-secondary);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-pulse-glow { animation: pulseGlow 8s ease-in-out infinite; }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+
+    <!-- Ambient Glowing Background Bubbles -->
+    <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[140px] pointer-events-none z-0 animate-pulse-glow transition-colors duration-500" style="background-color: var(--bubble-1);"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full blur-[140px] pointer-events-none z-0 animate-pulse-glow transition-colors duration-500" style="background-color: var(--bubble-2); animation-delay: 4s;"></div>
+
+    <!-- ================= USER LOGIN / ROLE SELECTION MODAL ================= -->
+    <div id="user-login-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="max-w-lg w-full glass-card p-6 sm:p-8 rounded-3xl border text-center space-y-6 shadow-2xl relative">
+            <div class="washi-tape-top flex items-center justify-center rounded-sm">
+                <span class="text-[9px] uppercase tracking-widest font-bold text-emerald-700 dark:text-emerald-300">Welcome ♡</span>
+            </div>
+
+            <div class="space-y-2 pt-2">
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold">Who's stepping into our little world?</h2>
+                <p class="themed-text-secondary text-xs sm:text-sm">Select your profile to enter our personal archive.</p>
+            </div>
+
+            <!-- Profile Cards Selection Grid -->
+            <div id="profile-selection-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <!-- Louie Card -->
+                <div onclick="selectLoginProfile('louie')" class="p-5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.03] text-center space-y-3 shadow-md group" style="background: var(--bubble-2); border-color: var(--accent-blue);">
+                    <div class="w-16 h-16 rounded-full mx-auto border-2 overflow-hidden flex items-center justify-center text-white text-2xl font-bold shadow-md" style="background-color: var(--accent-blue); border-color: var(--accent-blue);">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif font-bold text-lg">Louie</h3>
+                        <p class="text-[11px] themed-text-secondary italic">Website Owner</p>
+                    </div>
+                </div>
+
+                <!-- Pau Card -->
+                <div onclick="selectLoginProfile('pau')" class="p-5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.03] text-center space-y-3 shadow-md group" style="background: var(--bubble-1); border-color: var(--accent-green);">
+                    <div class="w-16 h-16 rounded-full mx-auto border-2 overflow-hidden flex items-center justify-center text-white text-2xl font-bold shadow-md" style="background-color: var(--accent-green); border-color: var(--accent-green);">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif font-bold text-lg">Pau</h3>
+                        <p class="text-[11px] themed-text-secondary italic">Contributor</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Louie Passcode Input Box -->
+            <div id="louie-passcode-box" class="hidden space-y-4 pt-2 border-t" style="border-color: var(--border-color);">
+                <div class="text-left">
+                    <label class="block text-xs font-bold mb-1">Enter Louie's Passcode *</label>
+                    <div class="relative">
+                        <input type="password" id="louie-password-input" placeholder="Enter password" class="w-full themed-input rounded-xl px-4 py-2.5 text-sm pr-10 focus:outline-none" value="">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 themed-text-secondary text-sm">
+                            <i id="pass-eye-icon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="louie-pass-error" class="hidden text-rose-500 text-xs font-semibold mt-1">Please enter a valid passcode.</div>
+                </div>
+
+                <div class="flex gap-3 justify-end">
+                    <button type="button" onclick="resetProfileSelection()" class="px-4 py-2 rounded-full border text-xs font-bold">Back</button>
+                    <button type="button" onclick="submitLouiePassword()" class="px-6 py-2 rounded-full text-white font-bold text-xs shadow-md" style="background-color: var(--accent-green);">Enter Our World</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= WELCOME ENVELOPE OVERLAY ================= -->
+    <div id="welcome-envelope-overlay" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 transition-opacity duration-700">
+        <div class="max-w-md w-full glass-card p-8 rounded-3xl border text-center space-y-6 shadow-2xl relative animate-float">
+            
+            <!-- Washi tape accent -->
+            <div class="washi-tape-top flex items-center justify-center rounded-sm">
+                <span class="text-[9px] uppercase tracking-widest font-bold text-emerald-700 dark:text-emerald-300">A Little Note For You ♡</span>
+            </div>
+
+            <!-- Envelope Icon / Closed State -->
+            <div id="welcome-envelope-closed" class="space-y-6 pt-4">
+                <div class="w-24 h-24 mx-auto rounded-3xl flex items-center justify-center border shadow-inner cursor-pointer hover:scale-105 transition-transform group relative" style="background: var(--bubble-1); border-color: var(--border-color);" onclick="openWelcomeEnvelope()">
+                    <div class="absolute -top-2 -right-2"><div class="wax-seal"><i class="fa-solid fa-heart text-xs"></i></div></div>
+                    <i class="fa-solid fa-envelope-open-text text-4xl group-hover:scale-110 transition-transform" style="color: var(--accent-green);"></i>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="font-serif text-2xl font-bold">For Pau</h3>
+                    <p class="themed-text-secondary text-xs">Tap the envelope to open your letter</p>
+                </div>
+                <button onclick="skipWelcomeLetter()" class="text-xs themed-text-secondary hover:underline pt-2">
+                    Skip and enter website →
+                </button>
+            </div>
+
+            <!-- Opened Letter Content State -->
+            <div id="welcome-envelope-opened" class="hidden space-y-5 text-left pt-2">
+                <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+                    <div class="flex items-center gap-2">
+                        <div class="wax-seal w-7 h-7 text-xs"><i class="fa-solid fa-heart"></i></div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-500">From Louie</span>
+                    </div>
+                    <span class="themed-text-secondary text-xs italic font-serif">Just for you</span>
+                </div>
+                
+                <div id="welcome-letter-text" class="font-serif text-sm sm:text-base leading-relaxed themed-text-secondary italic space-y-3 max-h-[45vh] overflow-y-auto pr-1">
+                    "I know this isn't much, and maybe you don't even want to see this. But I just wanted to share something with you. If you don't feel like reading it, that's okay. You don't have to. You can simply leave it unopened. But if you do want to see what's inside, you're welcome to continue."
+                </div>
+
+                <div id="welcome-letter-buttons" class="pt-2 flex flex-col sm:flex-row gap-3 justify-end">
+                    <button onclick="skipWelcomeLetter()" class="px-5 py-2.5 rounded-full border text-xs font-bold transition-all hover:border-emerald-400">
+                        Maybe another time
+                    </button>
+                    <button onclick="revealFullWelcomeLetter()" class="px-6 py-2.5 rounded-full text-white font-bold text-xs shadow-md transition-all hover:scale-105" style="background-color: var(--accent-green);">
+                        I'll read it
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 glass-card border-b transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#home" onclick="showSection('home')" class="flex items-center gap-2 group">
+                <i class="fa-solid fa-heart text-2xl group-hover:scale-110 transition-transform" style="color: var(--accent-green);"></i>
+                <span class="font-serif text-2xl font-bold bg-gradient-to-r from-teal-400 via-emerald-500 to-sky-500 bg-clip-text text-transparent">
+                    For My Love
+                </span>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center space-x-1.5 z-30 relative">
+                <button onclick="showSection('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-house text-xs"></i> Home
+                </button>
+                <button onclick="showSection('about')" id="nav-about" class="nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-heart text-xs text-rose-500"></i> About Her
+                </button>
+                <button onclick="showSection('story')" id="nav-story" class="nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-book-sparkles text-xs text-amber-500"></i> Our Story
+                </button>
+                <button onclick="showSection('letters')" id="nav-letters" class="nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-envelope text-xs"></i> Love Letters
+                </button>
+                <button onclick="showSection('playlist')" id="nav-playlist" class="nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-music text-xs"></i> Our Playlist
+                </button>
+
+                <!-- Active Role Indicator / Switch User -->
+                <button onclick="openRoleSwitchModal()" id="user-role-badge" class="ml-2 px-3 py-1.5 rounded-full border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" style="border-color: var(--border-color); background: var(--bubble-1); color: var(--accent-green);">
+                    <i class="fa-solid fa-circle-user"></i> <span id="user-role-label">Louie</span>
+                </button>
+
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" id="theme-toggle-btn" class="p-2.5 rounded-full border transition-all flex items-center justify-center w-10 h-10 cursor-pointer" style="border-color: var(--border-color); background: var(--card-bg);" title="Toggle Light/Dark Theme">
+                    <i id="theme-toggle-icon" class="fa-solid fa-sun text-sm" style="color: var(--accent-green);"></i>
+                </button>
+            </nav>
+
+            <!-- Mobile Controls -->
+            <div class="flex items-center gap-2 md:hidden z-30 relative">
+                <button onclick="toggleTheme()" class="p-2.5 rounded-full border w-10 h-10 flex items-center justify-center cursor-pointer" style="border-color: var(--border-color); background: var(--card-bg);">
+                    <i id="theme-toggle-icon-mobile" class="fa-solid fa-sun text-sm" style="color: var(--accent-green);"></i>
+                </button>
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="p-2.5 rounded-xl cursor-pointer">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden glass-card border-t px-4 pt-3 pb-5 space-y-2 z-30 relative">
+            <button onclick="showSection('home'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">
+                <i class="fa-solid fa-house w-6" style="color: var(--accent-green);"></i>Home
+            </button>
+            <button onclick="showSection('about'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">
+                <i class="fa-solid fa-heart w-6 text-rose-500"></i>About Her
+            </button>
+            <button onclick="showSection('story'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">
+                <i class="fa-solid fa-book-sparkles w-6 text-amber-500"></i>Our Story
+            </button>
+            <button onclick="showSection('letters'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">
+                <i class="fa-solid fa-envelope w-6" style="color: var(--accent-green);"></i>Love Letters
+            </button>
+            <button onclick="showSection('playlist'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">
+                <i class="fa-solid fa-music w-6" style="color: var(--accent-green);"></i>Our Playlist
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow z-10 w-full">
+
+        <!-- ================= HOME SECTION ================= -->
+        <section id="sec-home" class="space-y-8 sm:space-y-12 relative pb-12">
+            <div class="absolute -top-6 left-6 text-emerald-500/30 dark:text-emerald-400/20 animate-float text-2xl pointer-events-none select-none z-0">
+                <i class="fa-solid fa-seedling"></i>
+            </div>
+            <div class="absolute top-12 right-12 text-sky-500/30 dark:text-sky-400/20 animate-float text-xl pointer-events-none select-none z-0" style="animation-delay: 2s;">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <div class="absolute bottom-10 left-12 text-emerald-500/25 dark:text-emerald-400/15 animate-float text-lg pointer-events-none select-none z-0" style="animation-delay: 4s;">
+                <i class="fa-solid fa-star"></i>
+            </div>
+
+            <!-- Hero Banner Card: Scrapbook Archive Style -->
+            <div class="relative overflow-visible rounded-3xl glass-card p-6 sm:p-10 lg:p-14 border shadow-2xl flex flex-col items-center text-center max-w-4xl mx-auto backdrop-blur-xl z-10 my-4">
+                
+                <div class="washi-tape-top flex items-center justify-center rounded-sm z-20">
+                    <span class="text-[9px] uppercase tracking-widest font-bold text-emerald-700 dark:text-emerald-300">Made With Love ♡</span>
+                </div>
+
+                <div class="space-y-5 sm:space-y-6 z-10 max-w-2xl pt-3">
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider border shadow-sm" style="background-color: var(--bubble-1); color: var(--accent-green); border-color: var(--border-color);">
+                            <i class="fa-solid fa-bookmark text-[9px]"></i> Our Little World
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider border shadow-sm" style="background-color: var(--bubble-2); color: var(--accent-blue); border-color: var(--border-color);">
+                            <i class="fa-solid fa-feather text-[9px]"></i> A Collection of Us
+                        </span>
+                    </div>
+
+                    <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
+                        Project P.A.U.
+                    </h1>
+
+                    <p class="font-serif italic text-sm sm:text-lg text-emerald-600 dark:text-emerald-400 font-medium">
+                        "A little place for everything that makes us, us."
+                    </p>
+
+                    <p class="themed-text-secondary text-xs sm:text-base font-light leading-relaxed px-1 sm:px-2">
+                        Dearest Pau, I created this little digital archive just for you. Every word, melody, and captured memory here is a piece of my heart dedicated to our story. Whenever you open this page, know that you are deeply loved. — Louie
+                    </p>
+
+                    <!-- Front Page Music Toggle Player Widget -->
+                    <div class="max-w-md mx-auto glass-card p-3 sm:p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md my-2">
+                        <div class="flex items-center gap-3 w-full sm:w-auto text-left">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center border text-emerald-500 shadow-inner flex-shrink-0" style="background: var(--bubble-1); border-color: var(--border-color);">
+                                <i id="letter-audio-icon" class="fa-solid fa-music"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <h4 id="letter-audio-title-display" class="font-serif font-bold text-sm truncate">Background Melody</h4>
+                                <p class="themed-text-secondary text-[11px] italic font-serif">"Play this while reading, if you want. ♡"</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
+                            <button type="button" onclick="toggleLetterMusicPlayback()" id="letter-music-toggle-btn" class="px-4 py-2 rounded-full text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer" style="background-color: var(--accent-green);" disabled>
+                                <i id="letter-music-btn-icon" class="fa-solid fa-play"></i> <span id="letter-music-btn-text">Play Music</span>
+                            </button>
+                            <button type="button" id="btn-setup-letter-audio" onclick="openLetterAudioUploadModal()" class="px-3 py-2 rounded-full border text-xs font-bold hover:border-emerald-400 cursor-pointer">
+                                <i class="fa-solid fa-gear"></i> Setup
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 sm:gap-4 justify-center pt-2 sm:pt-4">
+                        <button onclick="triggerEnterWorld()" class="px-6 sm:px-7 py-3 sm:py-3.5 rounded-full text-white font-bold text-xs sm:text-sm transition-all shadow-xl flex items-center gap-2.5 group hover:scale-105 active:scale-95" style="background-color: var(--accent-green);">
+                            <span>Enter Our Little World</span>
+                            <i class="fa-solid fa-key text-xs group-hover:rotate-45 transition-transform"></i>
+                        </button>
+                        <button onclick="showSection('about')" class="px-5 sm:px-6 py-3 sm:py-3.5 rounded-full border font-bold text-xs sm:text-sm transition-all hover:border-emerald-400 flex items-center gap-2 shadow-sm" style="border-color: var(--border-color);">
+                            <i class="fa-solid fa-heart text-rose-500"></i>
+                            <span>About Her</span>
+                        </button>
+                    </div>
+
+                    <div class="pt-4 border-t border-dashed mt-4 sm:mt-6" style="border-color: var(--border-color);">
+                        <button onclick="toggleSecretNote()" class="text-xs themed-text-secondary hover:text-emerald-500 transition-colors inline-flex items-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-gift text-emerald-500"></i> Click here for a little secret message from Louie ♡
+                        </button>
+                        <div id="home-secret-note" class="hidden mt-3 p-4 rounded-2xl border text-xs sm:text-sm font-serif italic themed-text-secondary bg-emerald-500/5 border-emerald-500/20 animate-float">
+                            "Pau, you are my favorite thought upon waking and my last sweet wish before sleep. Thank you for being my home."
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Romantic Highlights Row (Updated to exclude Gallery) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
+                <div onclick="showSection('letters')" class="glass-card p-6 rounded-3xl border space-y-4 cursor-pointer hover:scale-[1.02] transition-transform shadow-lg group relative overflow-hidden">
+                    <div class="absolute top-2 right-2 text-emerald-500/10 text-4xl pointer-events-none"><i class="fa-solid fa-envelope"></i></div>
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center border" style="background: var(--bubble-1); border-color: var(--border-color); color: var(--accent-green);">
+                        <i class="fa-solid fa-envelope text-xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif text-xl font-bold">Love Letters</h3>
+                        <p class="themed-text-secondary text-xs mt-1 leading-relaxed">
+                            A safe place where quiet thoughts and sincere feelings are sealed into eternal love notes.
+                        </p>
+                    </div>
+                    <span class="text-xs font-bold flex items-center gap-1 group-hover:underline" style="color: var(--accent-green);">
+                        Read Envelope <i class="fa-solid fa-angle-right text-[10px]"></i>
+                    </span>
+                </div>
+
+                <div onclick="showSection('playlist')" class="glass-card p-6 rounded-3xl border space-y-4 cursor-pointer hover:scale-[1.02] transition-transform shadow-lg group relative overflow-hidden">
+                    <div class="absolute top-2 right-2 text-sky-500/10 text-4xl pointer-events-none"><i class="fa-solid fa-music"></i></div>
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center border" style="background: var(--bubble-2); border-color: var(--border-color); color: var(--accent-blue);">
+                        <i class="fa-solid fa-music text-xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif text-xl font-bold">Our Playlist</h3>
+                        <p class="themed-text-secondary text-xs mt-1 leading-relaxed">
+                            The soundtrack to our love story with songs and memories we cherish.
+                        </p>
+                    </div>
+                    <span class="text-xs font-bold flex items-center gap-1 group-hover:underline" style="color: var(--accent-blue);">
+                        Listen Now <i class="fa-solid fa-angle-right text-[10px]"></i>
+                    </span>
+                </div>
+
+                <div onclick="showSection('story')" class="glass-card p-6 rounded-3xl border space-y-4 cursor-pointer hover:scale-[1.02] transition-transform shadow-lg group relative overflow-hidden">
+                    <div class="absolute top-2 right-2 text-amber-500/10 text-4xl pointer-events-none"><i class="fa-solid fa-book-sparkles"></i></div>
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center border text-amber-500" style="background: var(--bubble-2); border-color: var(--border-color);">
+                        <i class="fa-solid fa-book-sparkles text-xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif text-xl font-bold">Our Story</h3>
+                        <p class="themed-text-secondary text-xs mt-1 leading-relaxed">
+                            Milestones, chapters, and the beautiful journey of how we met and grew together.
+                        </p>
+                    </div>
+                    <span class="text-xs font-bold flex items-center gap-1 group-hover:underline text-amber-500">
+                        Read Story <i class="fa-solid fa-angle-right text-[10px]"></i>
+                    </span>
+                </div>
+
+                <div onclick="showSection('about')" class="glass-card p-6 rounded-3xl border space-y-4 cursor-pointer hover:scale-[1.02] transition-transform shadow-lg group relative overflow-hidden">
+                    <div class="absolute top-2 right-2 text-rose-500/10 text-4xl pointer-events-none"><i class="fa-solid fa-heart"></i></div>
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center border text-rose-500" style="background: var(--bubble-1); border-color: var(--border-color);">
+                        <i class="fa-solid fa-heart text-xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif text-xl font-bold">About Her</h3>
+                        <p class="themed-text-secondary text-xs mt-1 leading-relaxed">
+                            Her favorite things, habits, colors, and everything that makes Pau truly special.
+                        </p>
+                    </div>
+                    <span class="text-xs font-bold flex items-center gap-1 group-hover:underline text-rose-500">
+                        Explore <i class="fa-solid fa-angle-right text-[10px]"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Quote Section -->
+            <div class="glass-card p-8 rounded-3xl border text-center space-y-3 shadow-xl max-w-3xl mx-auto relative overflow-hidden">
+                <div class="washi-tape-top flex items-center justify-center rounded-sm"></div>
+                <i class="fa-solid fa-quote-left text-3xl opacity-20 absolute top-6 left-6" style="color: var(--accent-green);"></i>
+                <p class="font-serif text-lg sm:text-xl italic font-medium leading-relaxed pt-2">
+                    "I loved you yesterday, I love you still, I always have, I always will."
+                </p>
+                <span class="block text-xs font-bold uppercase tracking-widest" style="color: var(--accent-green);">— Dedicated to My Favorite Person</span>
+            </div>
+        </section>
+
+        <!-- ================= ABOUT HER SECTION ================= -->
+        <section id="sec-about" class="hidden space-y-12 pb-20">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-6" style="border-color: var(--border-color);">
+                <div class="text-center sm:text-left space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-widest flex items-center gap-2 justify-center sm:justify-start text-rose-500">
+                        <i class="fa-solid fa-heart text-xs"></i> A Little More About You <i class="fa-solid fa-seedling text-xs" style="color: var(--accent-green);"></i>
+                    </span>
+                    <h2 class="font-serif text-3xl sm:text-5xl font-bold">All the little things that make you, you.</h2>
+                    <p class="themed-text-secondary text-sm sm:text-base font-serif italic">A scrapbook dedicated to Pau's favorite things, hobbies, habits, and sweet memories.</p>
+                </div>
+                
+                <div id="about-edit-controls" class="flex items-center gap-3">
+                    <button id="btn-edit-about-page" onclick="toggleAboutHerEditMode()" class="px-5 py-2.5 rounded-full border text-xs font-bold transition-all hover:scale-105 shadow-md flex items-center gap-2" style="border-color: var(--accent-green); color: var(--accent-green); background: var(--bubble-1);">
+                        <i class="fa-solid fa-pen-to-square"></i> <span id="about-about-edit-mode-label">Edit About Her</span>
+                    </button>
+                    <div id="about-save-actions" class="hidden flex items-center gap-2">
+                        <button onclick="saveAboutHerChanges()" class="px-5 py-2.5 rounded-full text-white font-bold text-xs transition-all shadow-md flex items-center gap-1.5" style="background-color: var(--accent-green);">
+                            <i class="fa-solid fa-check"></i> Save Changes
+                        </button>
+                        <button onclick="cancelAboutHerEdits()" class="px-4 py-2.5 rounded-full border text-xs font-bold hover:border-rose-400">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Her Dynamic Container -->
+            <div id="about-her-container" class="space-y-12">
+                <!-- Rendered dynamically via renderAboutHer() with complete original content restored -->
+            </div>
+        </section>
+
+        <!-- ================= OUR STORY SECTION ================= -->
+        <section id="sec-story" class="hidden space-y-8 pb-20">
+            <div class="text-center max-w-3xl mx-auto space-y-3">
+                <span class="text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2" style="color: var(--accent-green);">
+                    <i class="fa-solid fa-book-bookmark text-xs text-amber-500"></i> Our Journey Together <i class="fa-solid fa-heart text-xs text-rose-500"></i>
+                </span>
+                <h2 class="font-serif text-3xl sm:text-5xl font-bold">Our Story & First Experiences</h2>
+                <p class="themed-text-secondary text-sm sm:text-base font-serif italic">A treasured scrapbook collection of our milestones, first memories, quiet calls, special songs, and little moments.</p>
+            </div>
+
+            <!-- Categories / Filter Bar -->
+            <div class="flex flex-wrap gap-2 justify-center pt-2 z-30 relative pointer-events-auto">
+                <button type="button" onclick="filterStoryCategory('All')" id="story-cat-All" class="story-cat-btn px-4 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">All Memories</button>
+                <button type="button" onclick="filterStoryCategory('How We Met')" id="story-cat-How We Met" class="story-cat-btn px-4 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">How We Met</button>
+                <button type="button" onclick="filterStoryCategory('Our First Conversation')" id="story-cat-Our First Conversation" class="story-cat-btn px-4 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">First Conversation</button>
+                <button type="button" onclick="filterStoryCategory('Our First Call')" id="story-cat-Our First Call" class="story-cat-btn px-4 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">First Call</button>
+                <button type="button" onclick="filterStoryCategory('Our First Song')" id="story-cat-Our First Song" class="story-cat-btn px-4 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">First Song</button>
+                <button type="button" onclick="filterStoryCategory('Our First Memories')" id="story-cat-Our First Memories" class="story-cat-btn px-4 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">First Memories</button>
+                <button type="button" onclick="filterStoryCategory('Little Moments')" id="story-cat-Little Moments" class="story-cat-btn px-4 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">Little Moments</button>
+            </div>
+
+            <!-- Action Controls for Louie -->
+            <div id="story-owner-actions" class="flex items-center justify-between border-b pb-4" style="border-color: var(--border-color);">
+                <div class="text-xs font-bold themed-text-secondary">
+                    <span id="story-entry-count" class="text-emerald-500 font-bold">0</span> story memories recorded
+                </div>
+                <button id="btn-add-story-entry" onclick="openStoryModal()" class="px-5 py-2.5 rounded-full text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2 hover:scale-105" style="background-color: var(--accent-green);">
+                    <i class="fa-solid fa-plus"></i> Add New Memory
+                </button>
+            </div>
+
+            <!-- Story Cards Grid -->
+            <div id="story-entries-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Dynamically populated story items -->
+            </div>
+        </section>
+
+        <!-- ================= LOVE LETTERS SECTION ================= -->
+        <section id="sec-letters" class="hidden space-y-8">
+            <div class="text-center max-w-2xl mx-auto space-y-3">
+                <span class="text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2" style="color: var(--accent-green);">
+                    <i class="fa-solid fa-heart text-xs text-rose-500"></i> From My Heart To Yours <i class="fa-solid fa-heart text-xs text-rose-500"></i>
+                </span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold">Love Letters</h2>
+                <p class="themed-text-secondary text-sm sm:text-base">Sealed thoughts, quiet confessions, and heartfelt messages from Louie to Pau.</p>
+            </div>
+
+            <!-- Love Letters Sub-Tabs -->
+            <div class="flex flex-wrap gap-2 justify-center pt-1 z-30 relative pointer-events-auto">
+                <button type="button" onclick="switchLetterTab('letters')" class="letter-tab-btn px-5 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer pointer-events-auto" id="tab-btn-letters">
+                    <i class="fa-solid fa-envelope mr-1.5"></i> Letters
+                </button>
+                <button type="button" onclick="switchLetterTab('unsent')" class="letter-tab-btn px-5 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer pointer-events-auto" id="tab-btn-unsent">
+                    <i class="fa-solid fa-envelope-circle-check mr-1.5"></i> Unsent Letters
+                </button>
+                <button type="button" onclick="switchLetterTab('pau')" class="letter-tab-btn px-5 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer pointer-events-auto" id="tab-btn-pau">
+                    <i class="fa-solid fa-feather mr-1.5"></i> Pau's Letters to Louie
+                </button>
+            </div>
+
+            <!-- Action Button Container -->
+            <div class="flex justify-end">
+                <button id="letter-action-btn" onclick="openNewLetterModal()" class="px-5 py-2.5 rounded-full text-white font-bold text-sm transition-all shadow-lg flex items-center gap-2" style="background-color: var(--accent-green);">
+                    <i class="fa-solid fa-pen-nib"></i> + Write Letter
+                </button>
+            </div>
+
+            <div id="letters-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically Populated Letters -->
+            </div>
+        </section>
+
+        <!-- ================= OUR PLAYLIST SECTION ================= -->
+        <section id="sec-playlist" class="hidden space-y-8">
+            <div class="text-center max-w-2xl mx-auto space-y-3">
+                <span class="text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2" style="color: var(--accent-green);">
+                    <i class="fa-solid fa-music text-xs"></i> Songs That Remind Me of You ♡ <i class="fa-solid fa-music text-xs"></i>
+                </span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold">Our Music Archive</h2>
+                <p class="themed-text-secondary text-sm sm:text-base font-light leading-relaxed">
+                    "Some songs remind me of certain moments, some remind me of how I feel, and some remind me of you. Explore our musical memories below." — Louie & Pau
+                </p>
+            </div>
+
+            <!-- Playlist Sub-tabs & Filter Controls -->
+            <div class="flex flex-wrap gap-2 justify-center pt-1 z-30 relative pointer-events-auto">
+                <button type="button" onclick="filterPlaylistCategory('All')" id="playlist-cat-All" class="playlist-cat-btn px-5 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-compact-disc mr-1.5"></i> All Songs
+                </button>
+                <button type="button" onclick="filterPlaylistCategory('The Firsts')" id="playlist-cat-The Firsts" class="playlist-cat-btn px-5 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-seedling mr-1.5"></i> The Firsts
+                </button>
+                <button type="button" onclick="filterPlaylistCategory('You Remind Me of This')" id="playlist-cat-You Remind Me of This" class="playlist-cat-btn px-5 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-heart mr-1.5"></i> You Remind Me of This
+                </button>
+                <button type="button" onclick="filterPlaylistCategory('Songs I Want You to Hear')" id="playlist-cat-Songs I Want You to Hear" class="playlist-cat-btn px-5 py-2 rounded-full text-xs font-bold border transition-all shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-headphones mr-1.5"></i> Songs I Want You to Hear
+                </button>
+            </div>
+
+            <!-- Spotify Header Bar & Add Song Button -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 text-emerald-500/10 text-7xl pointer-events-none"><i class="fa-brands fa-spotify"></i></div>
+                <div class="flex items-center gap-3 z-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white bg-[#1DB954] shadow-md">
+                        <i class="fa-brands fa-spotify text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base tracking-wide">COMPACT MUSIC ARCHIVE</h3>
+                        <p class="themed-text-secondary text-xs">Shared musical memories between Louie & Pau</p>
+                    </div>
+                </div>
+                <button onclick="openAddSongModal()" class="px-5 py-2.5 rounded-full text-white font-bold text-xs sm:text-sm transition-all shadow-md flex items-center gap-2 z-10" style="background-color: var(--accent-green);">
+                    <i class="fa-solid fa-plus text-xs"></i> Add Favorite Song
+                </button>
+            </div>
+
+            <!-- Playlist Grid Container -->
+            <div id="playlist-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically populated song cards -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Add / Edit Story Entry Modal -->
+    <div id="story-entry-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-3xl p-6 sm:p-8 border space-y-5 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeStoryModal()" class="absolute top-4 right-4 themed-text-secondary text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="story-modal-title" class="font-serif text-2xl font-bold flex items-center gap-2" style="color: var(--accent-green);">
+                <i class="fa-solid fa-book-sparkles"></i> Add Story Memory
+            </h3>
+            
+            <form onsubmit="handleSaveStoryEntry(event)" class="space-y-4 text-sm">
+                <input type="hidden" id="story-entry-id">
+                <div>
+                    <label class="block font-semibold mb-1">Memory Title *</label>
+                    <input type="text" id="story-title-input" required placeholder="e.g. The First Time We Spoke" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold mb-1">Category *</label>
+                        <select id="story-category-input" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                            <option value="How We Met">How We Met</option>
+                            <option value="Our First Conversation">Our First Conversation</option>
+                            <option value="Our First Call">Our First Call</option>
+                            <option value="Our First Song">Our First Song</option>
+                            <option value="Our First Memories">Our First Memories</option>
+                            <option value="Our Firsts Together">Our Firsts Together</option>
+                            <option value="Little Moments">Little Moments</option>
+                            <option value="Custom">Custom Memory</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Date / Tag</label>
+                        <input type="text" id="story-date-input" placeholder="e.g. October 14" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1">Personal Note / Description *</label>
+                    <textarea id="story-desc-input" rows="4" required placeholder="Write your memory story here..." class="w-full themed-input rounded-xl p-3 focus:outline-none leading-relaxed whitespace-pre-wrap"></textarea>
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1">Upload Photos From Computer</label>
+                    <input type="file" id="story-file-input" accept="image/*" multiple onchange="handleStoryPhotoUpload(event)" class="w-full themed-input rounded-xl px-3 py-2 text-xs">
+                    <input type="hidden" id="story-photos-data">
+                </div>
+
+                <!-- Photos Preview Area -->
+                <div id="story-photos-preview" class="hidden flex gap-2 overflow-x-auto py-2"></div>
+
+                <div class="pt-2 flex gap-3 justify-end">
+                    <button type="button" onclick="closeStoryModal()" class="px-4 py-2 rounded-full border">Cancel</button>
+                    <button type="submit" class="px-6 py-2 rounded-full text-white font-bold" style="background-color: var(--accent-green);">Save Memory</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Letter View/Add Modal -->
+    <div id="letter-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-xl w-full rounded-3xl p-6 sm:p-8 border space-y-6 relative">
+            <button onclick="closeLetterModal()" class="absolute top-4 right-4 themed-text-secondary text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="letter-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Love Letter Audio Setup Modal -->
+    <div id="letter-audio-upload-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-3xl p-6 border space-y-5 relative">
+            <button onclick="closeLetterAudioUploadModal()" class="absolute top-4 right-4 themed-text-secondary text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="font-serif text-2xl font-bold flex items-center gap-2" style="color: var(--accent-green);">
+                <i class="fa-solid fa-headphones"></i> Letter Background Music
+            </h3>
+            
+            <form onsubmit="handleSaveLetterAudio(event)" class="space-y-4 text-sm">
+                <div>
+                    <label class="block font-semibold mb-1">Song Title / Description *</label>
+                    <input type="text" id="letter-audio-title-input" required placeholder="e.g. Our Special Melody" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Upload Audio File (.mp3, .wav) *</label>
+                    <input type="file" id="letter-audio-file-input" accept="audio/mp3,audio/wav,audio/mpeg,audio/*" onchange="previewSelectedAudio(event)" class="w-full themed-input rounded-xl px-3.5 py-2 text-xs">
+                    <p class="text-[10px] themed-text-secondary mt-1">Supports cloud persistent storage synchronization across devices.</p>
+                </div>
+                
+                <!-- Live Audio Preview Player -->
+                <div id="audio-preview-container" class="hidden space-y-2 p-3 rounded-xl border bg-slate-900/30">
+                    <p class="text-xs font-bold text-emerald-500">Preview Selected File:</p>
+                    <audio id="modal-audio-preview" controls class="w-full h-10"></audio>
+                </div>
+
+                <!-- Upload Progress & Status Indicators -->
+                <div id="audio-upload-progress-box" class="hidden space-y-1">
+                    <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
+                        <div id="audio-upload-progress-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                    <p id="audio-upload-status-text" class="text-[11px] themed-text-secondary text-center">Uploading to cloud storage...</p>
+                </div>
+
+                <div id="audio-upload-error" class="hidden text-rose-500 text-xs font-bold"></div>
+                <div id="audio-upload-success" class="hidden text-emerald-500 text-xs font-bold">Audio successfully uploaded and saved to cloud!</div>
+                
+                <div class="pt-2 flex gap-3 justify-end">
+                    <button type="button" onclick="removeLetterAudio()" class="px-4 py-2 rounded-full border text-xs font-bold text-rose-500 hover:border-rose-400 mr-auto">Remove Audio</button>
+                    <button type="button" onclick="closeLetterAudioUploadModal()" class="px-4 py-2 rounded-full border">Cancel</button>
+                    <button type="submit" id="btn-save-audio-submit" class="px-6 py-2 rounded-full text-white font-bold" style="background-color: var(--accent-green);">Upload & Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- About Her Item Add/Edit Modal -->
+    <div id="about-item-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-3xl p-6 sm:p-8 border space-y-5 relative">
+            <button onclick="closeAboutItemModal()" class="absolute top-4 right-4 themed-text-secondary text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="about-modal-header" class="font-serif text-2xl font-bold flex items-center gap-2" style="color: var(--accent-green);">
+                <i class="fa-solid fa-pen"></i> Add / Edit Detail
+            </h3>
+            <form onsubmit="handleSaveAboutItem(event)" class="space-y-4 text-sm">
+                <input type="hidden" id="about-item-section">
+                <input type="hidden" id="about-item-id">
+                <div>
+                    <label class="block font-semibold mb-1">Title / Name *</label>
+                    <input type="text" id="about-item-title" required placeholder="e.g. Favorite Item" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Description / Details *</label>
+                    <textarea id="about-item-desc" rows="4" required placeholder="Describe this detail..." class="w-full themed-input rounded-xl p-3 focus:outline-none leading-relaxed"></textarea>
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Upload Photo (Optional)</label>
+                    <input type="file" id="about-item-file" accept="image/*" onchange="handleAboutItemPhotoUpload(event)" class="w-full themed-input rounded-xl px-3 py-2 text-xs">
+                    <input type="hidden" id="about-item-photo">
+                </div>
+                <div class="pt-2 flex gap-3 justify-end">
+                    <button type="button" onclick="closeAboutItemModal()" class="px-4 py-2 rounded-full border">Cancel</button>
+                    <button type="submit" class="px-6 py-2 rounded-full text-white font-bold" style="background-color: var(--accent-green);">Save Detail</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Compose / Edit Letter Modal -->
+    <div id="compose-letter-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-3xl p-6 sm:p-8 border space-y-5 relative">
+            <button onclick="closeComposeLetterModal()" class="absolute top-4 right-4 themed-text-secondary text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="compose-modal-title" class="font-serif text-2xl font-bold flex items-center gap-2" style="color: var(--accent-green);">
+                <i class="fa-solid fa-pen-nib"></i> Write a Love Letter
+            </h3>
+            <form onsubmit="handleSaveLetterForm(event)" class="space-y-4 text-sm">
+                <input type="hidden" id="letter-edit-id">
+                <div>
+                    <label class="block font-semibold mb-1">Letter Title *</label>
+                    <input type="text" id="letter-title-input" required placeholder="e.g. To My Dearest Love" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Date / Tag</label>
+                    <input type="text" id="letter-date-input" placeholder="e.g. Today or October 2024" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Letter Content (multiline supported) *</label>
+                    <textarea id="letter-text-input" rows="6" required placeholder="Write your heartfelt message here..." class="w-full themed-input rounded-xl p-3 focus:outline-none leading-relaxed whitespace-pre-wrap"></textarea>
+                </div>
+                <div class="pt-2 flex gap-3 justify-end">
+                    <button type="button" onclick="closeComposeLetterModal()" class="px-4 py-2 rounded-full border">Cancel</button>
+                    <button type="submit" class="px-6 py-2 rounded-full text-white font-bold" style="background-color: var(--accent-green);">Save Letter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add / Edit Song Modal -->
+    <div id="add-song-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-3xl p-6 border space-y-5 relative">
+            <button onclick="closeAddSongModal()" class="absolute top-4 right-4 themed-text-secondary text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="song-modal-title" class="font-serif text-2xl font-bold flex items-center gap-2" style="color: var(--accent-green);">
+                <i class="fa-solid fa-music"></i> Add Song to Playlist
+            </h3>
+            
+            <form onsubmit="handleSaveSong(event)" class="space-y-4 text-sm">
+                <input type="hidden" id="song-edit-id">
+                <div>
+                    <label class="block font-semibold mb-1">Song Title *</label>
+                    <input type="text" id="song-title-input" required placeholder="e.g. Perfect" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Artist *</label>
+                    <input type="text" id="song-artist-input" required placeholder="e.g. Ed Sheeran" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Playlist Section *</label>
+                    <select id="song-section-input" class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                        <option value="The Firsts">The Firsts</option>
+                        <option value="You Remind Me of This">You Remind Me of This</option>
+                        <option value="Songs I Want You to Hear">Songs I Want You to Hear</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Spotify Track URL or Track ID *</label>
+                    <input type="text" id="song-spotify-input" required placeholder="https://open.spotify.com/track/..." class="w-full themed-input rounded-xl px-3.5 py-2.5 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Personal Note / Memory</label>
+                    <textarea id="song-note-input" rows="2" placeholder="Why this song reminds us of each other..." class="w-full themed-input rounded-xl p-3 focus:outline-none"></textarea>
+                </div>
+                <div class="pt-2 flex gap-3 justify-end">
+                    <button type="button" onclick="closeAddSongModal()" class="px-4 py-2 rounded-full border">Cancel</button>
+                    <button type="submit" class="px-6 py-2 rounded-full text-white font-bold" style="background-color: var(--accent-green);">Save Song</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-card border-t py-6 mt-16 text-center text-xs z-10">
+        <p class="font-serif text-sm" style="color: var(--accent-green);">Designed with love for my favorite person</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Global Theme & User Role State
+        let currentTheme = localStorage.getItem('love_theme') || 'dark';
+        window.currentUserRole = window.currentUserRole || 'owner'; // 'owner' (Louie) or 'contributor' (Pau)
+        window.currentUserName = window.currentUserName || 'Louie';
+        let activeLetterTab = 'letters';
+        let activeStoryCategory = 'All';
+        let activePlaylistCategory = 'All';
+
+        // Synchronize window role functions with instance handlers
+        window.updateUserRoleUI = function() {
+            const badgeLabel = document.getElementById('user-role-label');
+            if (badgeLabel) badgeLabel.innerText = window.currentUserName;
+
+            const editAboutBtn = document.getElementById('btn-edit-about-page');
+            if (editAboutBtn) {
+                if (window.currentUserRole === 'owner') editAboutBtn.classList.remove('hidden');
+                else editAboutBtn.classList.add('hidden');
+            }
+
+            const storyAddBtn = document.getElementById('btn-add-story-entry');
+            if (storyAddBtn) {
+                if (window.currentUserRole === 'owner') storyAddBtn.classList.remove('hidden');
+                else storyAddBtn.classList.add('hidden');
+            }
+
+            const setupAudioBtn = document.getElementById('btn-setup-letter-audio');
+            if (setupAudioBtn) {
+                if (window.currentUserRole === 'owner') setupAudioBtn.classList.remove('hidden');
+                else setupAudioBtn.classList.add('hidden');
+            }
+        };
+
+        // Persistent State Hydration with Safe Fallback Preservations
+        let storyEntriesList = JSON.parse(localStorage.getItem('love_our_story_entries')) || [];
+        
+        // Deduplicate initial or stored story entries to ensure no repeated posts appear
+        if (storyEntriesList.length > 0) {
+            const seenKeys = new Set();
+            storyEntriesList = storyEntriesList.filter(item => {
+                const uniqueKey = (item.title + '|' + item.date).trim().toLowerCase();
+                if (seenKeys.has(uniqueKey)) {
+                    return false; // Remove duplicate
+                }
+                seenKeys.add(uniqueKey);
+                return true;
+            });
+            localStorage.setItem('love_our_story_entries', JSON.stringify(storyEntriesList));
+        }
+
+        let pendingStoryPhotos = [];
+
+        let lettersList = JSON.parse(localStorage.getItem('love_letters')) || [
+            { id: 1, title: "To My Dearest Love", date: "Today", text: "Thank you for being my constant source of joy and peace. I love you more than words can say.", author: "Louie" }
+        ];
+        let unsentLettersList = JSON.parse(localStorage.getItem('love_unsent_letters')) || [];
+        let pauLettersList = JSON.parse(localStorage.getItem('love_pau_letters')) || [];
+        
+        // Love Letter Background Audio State with Cloud & Local Sync
+        let loveLetterAudioData = JSON.parse(localStorage.getItem('love_letter_audio_data')) || null;
+        let persistentAudioPlayer = new Audio();
+        persistentAudioPlayer.loop = true;
+
+        // Initialize persistent audio if saved
+        function initLoveLetterAudioPlayer() {
+            const toggleBtn = document.getElementById('letter-music-toggle-btn');
+            const titleDisplay = document.getElementById('letter-audio-title-display');
+            const setupBtn = document.getElementById('btn-setup-letter-audio');
+
+            if (setupBtn) {
+                if (currentUserRole === 'owner') setupBtn.classList.remove('hidden');
+                else setupBtn.classList.add('hidden');
+            }
+
+            if (loveLetterAudioData && loveLetterAudioData.src) {
+                persistentAudioPlayer.src = loveLetterAudioData.src;
+                if (titleDisplay) titleDisplay.innerText = loveLetterAudioData.title || "Background Melody";
+                if (toggleBtn) toggleBtn.removeAttribute('disabled');
+            } else {
+                if (titleDisplay) titleDisplay.innerText = "No Music Uploaded";
+                if (toggleBtn) toggleBtn.setAttribute('disabled', 'true');
+            }
+        }
+
+        function toggleLetterMusicPlayback() {
+            const btnIcon = document.getElementById('letter-music-btn-icon');
+            const btnText = document.getElementById('letter-music-btn-text');
+
+            if (!loveLetterAudioData || !loveLetterAudioData.src) return;
+
+            if (persistentAudioPlayer.paused) {
+                persistentAudioPlayer.play().then(() => {
+                    if (btnIcon) btnIcon.className = 'fa-solid fa-pause';
+                    if (btnText) btnText.innerText = 'Pause Music';
+                }).catch(err => {
+                    console.error("Audio playback error:", err);
+                    alert("Unable to play audio file. Please check browser permissions.");
+                });
+            } else {
+                persistentAudioPlayer.pause();
+                if (btnIcon) btnIcon.className = 'fa-solid fa-play';
+                if (btnText) btnText.innerText = 'Play Music';
+            }
+        }
+
+        function openLetterAudioUploadModal() {
+            if (currentUserRole !== 'owner') return;
+            const errEl = document.getElementById('audio-upload-error');
+            const succEl = document.getElementById('audio-upload-success');
+            const progBox = document.getElementById('audio-upload-progress-box');
+            const previewBox = document.getElementById('audio-preview-container');
+
+            if (errEl) errEl.classList.add('hidden');
+            if (succEl) succEl.classList.add('hidden');
+            if (progBox) progBox.classList.add('hidden');
+            if (previewBox) previewBox.classList.add('hidden');
+
+            if (loveLetterAudioData && loveLetterAudioData.title) {
+                document.getElementById('letter-audio-title-input').value = loveLetterAudioData.title;
+            } else {
+                document.getElementById('letter-audio-title-input').value = '';
+            }
+            document.getElementById('letter-audio-file-input').value = '';
+            document.getElementById('letter-audio-upload-modal').classList.remove('hidden');
+        }
+
+        function closeLetterAudioUploadModal() {
+            document.getElementById('letter-audio-upload-modal').classList.add('hidden');
+        }
+
+        function previewSelectedAudio(e) {
+            const file = e.target.files[0];
+            const previewBox = document.getElementById('audio-preview-container');
+            const audioPreviewEl = document.getElementById('modal-audio-preview');
+
+            if (file && previewBox && audioPreviewEl) {
+                const objectUrl = URL.createObjectURL(file);
+                audioPreviewEl.src = objectUrl;
+                previewBox.classList.remove('hidden');
+                
+                const titleInput = document.getElementById('letter-audio-title-input');
+                if (titleInput && !titleInput.value) {
+                    let cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                    titleInput.value = cleanName;
+                }
+            }
+        }
+
+        function handleSaveLetterAudio(e) {
+            e.preventDefault();
+            if (currentUserRole !== 'owner') return;
+
+            const title = document.getElementById('letter-audio-title-input').value;
+            const fileInput = document.getElementById('letter-audio-file-input');
+            const file = fileInput.files[0];
+            const errEl = document.getElementById('audio-upload-error');
+            const succEl = document.getElementById('audio-upload-success');
+            const progBox = document.getElementById('audio-upload-progress-box');
+            const progressBar = document.getElementById('audio-upload-progress-bar');
+            const statusText = document.getElementById('audio-upload-status-text');
+            const submitBtn = document.getElementById('btn-save-audio-submit');
+
+            if (errEl) errEl.classList.add('hidden');
+            if (succEl) succEl.classList.add('hidden');
+
+            if (file) {
+                if (file.size > 12 * 1024 * 1024) {
+                    if (errEl) {
+                        errEl.innerText = "File size exceeds 12MB limit. Please choose a smaller audio file.";
+                        errEl.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                if (progBox) progBox.classList.remove('hidden');
+                if (submitBtn) submitBtn.setAttribute('disabled', 'true');
+                if (progressBar) progressBar.style.width = '20%';
+                if (statusText) statusText.innerText = 'Reading audio file...';
+
+                const reader = new FileReader();
+                reader.onprogress = function(evt) {
+                    if (evt.lengthComputable && progressBar) {
+                        const percent = Math.round((evt.loaded / evt.total) * 70) + 20;
+                        progressBar.style.width = percent + '%';
+                    }
+                };
+
+                reader.onload = function(evt) {
+                    try {
+                        if (progressBar) progressBar.style.width = '100%';
+                        if (statusText) statusText.innerText = 'Saving to cloud persistent storage...';
+
+                        loveLetterAudioData = {
+                            title: title,
+                            src: evt.target.result,
+                            uploadedAt: new Date().toISOString()
+                        };
+
+                        localStorage.setItem('love_letter_audio_data', JSON.stringify(loveLetterAudioData));
+
+                        setTimeout(() => {
+                            if (progBox) progBox.classList.add('hidden');
+                            if (succEl) succEl.classList.remove('hidden');
+                            if (submitBtn) submitBtn.removeAttribute('disabled');
+
+                            setTimeout(() => {
+                                initLoveLetterAudioPlayer();
+                                closeLetterAudioUploadModal();
+                            }, 900);
+                        }, 500);
+                    } catch (storageErr) {
+                        console.error("Cloud storage sync error:", storageErr);
+                        if (progBox) progBox.classList.add('hidden');
+                        if (submitBtn) submitBtn.removeAttribute('disabled');
+                        if (errEl) {
+                            errEl.innerText = "Storage quota exceeded. Please select a smaller audio file.";
+                            errEl.classList.remove('hidden');
+                        }
+                    }
+                };
+
+                reader.onerror = function() {
+                    if (progBox) progBox.classList.add('hidden');
+                    if (submitBtn) submitBtn.removeAttribute('disabled');
+                    if (errEl) {
+                        errEl.innerText = "Failed to read the audio file. Please try again.";
+                        errEl.classList.remove('hidden');
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            } else if (loveLetterAudioData) {
+                loveLetterAudioData.title = title;
+                try {
+                    localStorage.setItem('love_letter_audio_data', JSON.stringify(loveLetterAudioData));
+                    if (succEl) succEl.classList.remove('hidden');
+                    setTimeout(() => {
+                        initLoveLetterAudioPlayer();
+                        closeLetterAudioUploadModal();
+                    }, 800);
+                } catch(err) {
+                    if (errEl) {
+                        errEl.innerText = "Failed to save changes.";
+                        errEl.classList.remove('hidden');
+                    }
+                }
+            } else {
+                if (errEl) {
+                    errEl.innerText = "Please select an audio file to upload.";
+                    errEl.classList.remove('hidden');
+                }
+            }
+        }
+
+        function removeLetterAudio() {
+            if (currentUserRole !== 'owner') return;
+            if (!confirm("Are you sure you want to remove the love letter background music?")) return;
+            persistentAudioPlayer.pause();
+            loveLetterAudioData = null;
+            localStorage.removeItem('love_letter_audio_data');
+            initLoveLetterAudioPlayer();
+            closeLetterAudioUploadModal();
+        }
+
+        let defaultSongsList = [
+            { id: 1, title: "Perfect", artist: "Ed Sheeran", spotifyUrl: "https://open.spotify.com/track/0KH36m19468087799", section: "The Firsts", note: "Reminds me of slow dances with you.", addedBy: "Louie" },
+            { id: 2, title: "Lover", artist: "Taylor Swift", spotifyUrl: "https://open.spotify.com/track/1r9A8P2m3pL2G4", section: "You Remind Me of This", note: "Can I go where you go?", addedBy: "Pau" },
+            { id: 3, title: "Until I Found You", artist: "Stephen Sanchez", spotifyUrl: "https://open.spotify.com/track/0T5iIrB492vR3ip9M84S2G", section: "Songs I Want You to Hear", note: "I would never fall in love until I found her.", addedBy: "Louie" }
+        ];
+
+        let songsList = JSON.parse(localStorage.getItem('love_playlist')) || defaultSongsList;
+        
+        songsList = songsList.map(s => {
+            if (s.section === 'Our Playlist') s.section = 'The Firsts';
+            if (s.section === "Pau's Playlist") s.section = 'You Remind Me of This';
+            if (s.section === 'Shared Songs') s.section = 'Songs I Want You to Hear';
+            return s;
+        });
+
+        // About Her Dataset & State - Strict Preservation Guardrail
+        let defaultAboutHerData = {
+            birthday: "May 14",
+            profilePicture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
+            shortIntro: "Dearest Pau, this is a little corner dedicated entirely to you—your favorite things, your radiant smile, and all the quiet moments that make you my favorite person in the world. From the late-night talks to the simplest things that bring joy to your heart, everything here is a reminder of how deeply cherished you are.",
+            colors: [
+                { name: "Green", hex: "#10b981", bg: "rgba(16, 185, 129, 0.2)" },
+                { name: "Red", hex: "#ef4444", bg: "rgba(239, 68, 68, 0.2)" },
+                { name: "Black", hex: "#0f172a", bg: "rgba(15, 23, 42, 0.3)" }
+            ],
+            favorites: [
+                { id: 1, title: "Bread (Ube Loaf)", desc: "Especially Ube Loaf from Julie's. Soft, sweet, and comforting.", icon: "fa-bread-slice" },
+                { id: 2, title: "Ice Cream", desc: "Especially Choco Berry Fudge & Cookies and Cream flavors.", icon: "fa-ice-cream" },
+                { id: 3, title: "Cheese Pizza", desc: "Cheesy, warm, and comforting pizza cravings.", icon: "fa-pizza-slice" },
+                { id: 4, title: "Pasta", desc: "Especially creamy and delicious Carbonara.", icon: "fa-bowl-food" },
+                { id: 5, title: "Lechon Sisig", desc: "Sizzling, savory, and full of flavor.", icon: "fa-utensils" },
+                { id: 6, title: "Jollibee Chicken", desc: "Classic crispy chicken joy that never disappoints.", icon: "fa-drumstick-bite" },
+                { id: 7, title: "Fries", desc: "Especially Sour Cream flavor—crispy and delightful.", icon: "fa-french-fries" }
+            ],
+            hobbies: [
+                { id: 1, title: "Reading", desc: "Getting completely lost in wonderful pages, novels, and stories.", icon: "fa-book-open-reader" },
+                { id: 2, title: "Writing", desc: "Jotting down thoughts, journal entries, and sweet notes.", icon: "fa-pen-nib" },
+                { id: 3, title: "Watching Anime & Movies", desc: "Enjoying immersive cinematic worlds and favorite series.", icon: "fa-clapperboard" },
+                { id: 4, title: "Playing Games", desc: "Engaging in fun gaming adventures and relaxing challenges.", icon: "fa-gamepad" },
+                { id: 5, title: "Drawing", desc: "Sketching creative illustrations and doodling ideas.", icon: "fa-palette" },
+                { id: 6, title: "Singing", desc: "Humming and singing along to favorite comforting melodies.", icon: "fa-microphone-lines" }
+            ],
+            happinessNote: "One of the things that makes you really happy is waking up and finding a written message waiting for you. You love having something to read as soon as you open your eyes. It makes your day brighter and gives you something sweet to look forward to.",
+            littleThings: [
+                { id: 1, title: "The Way You Smile", desc: "That radiant smile that instantly lights up the room and warms my entire heart every single time I see it.", icon: "fa-smile" },
+                { id: 2, title: "Your Little 'Ehe'", desc: "That little 'ehe' you always say whenever I call you out for buying something again or catching you doing something silly. HAHAHA. It's such a small thing, but I've come to recognize it as one of those little expressions that are so uniquely you. I can almost expect to hear it whenever you're caught doing something you're not supposed to. It's one of those tiny things about you that never fails to make me smile.", icon: "fa-face-laugh-beam" },
+                { id: 3, title: "Your Little Gasps", desc: "I swear, I love hearing those little gasps of yours whenever you see something you really, really like. HAHAHA. There's just something about the way you react, how your voice changes, how excited you get, and how you can't help but express it. Even when you're just showing me something or telling me about an idea you have, I can hear that excitement in your voice. And honestly, I find it so adorable. I hope you never lose that side of you, baby. I love seeing you get excited over the little things, and if I could, I'd listen to you talk about everything that makes your eyes light up for hours. ❤️", icon: "fa-sparkles" },
+                { id: 4, title: "Those Little Giggles of Yours", desc: "I remember that one time na pagkagising ko, narinig kitang tumatawa. That was actually the first time na narinig kitang tumawa nang gano'n, and I remember how it instantly made me smile. HAHAHA. Yung tawa mo, hindi ko alam kung paano ie-explain, pero parang nawawala lahat ng pagod ko kapag naririnig ko. Ang gaan sa pakiramdam, ang calming pakinggan, and there's just something about it na nakakapagpalambot ng puso. I don't know if you remember that moment as much as I do, pero hanggang ngayon, dala-dala ko pa rin yung memory na 'yon. It's one of those little things about you that I wish I could hear over and over again. ❤️", icon: "fa-face-smile" },
+                { id: 5, title: "Your Soft Voice When Talking to Me", desc: "Alam mo, one of the things I really love is yung soft voice mo whenever you're talking to me. I don't know if you notice it, pero ang gaan lang sa feeling whenever I hear you speak. Especially kapag tayo lang nag-uusap, telling me random stories or even just talking about the simplest things. Minsan gusto ko na lang makinig sa'yo and let you talk about whatever's on your mind. There's something about your voice that makes me feel calm, na parang kahit pagod ako or ang daming nangyayari, hearing you talk makes everything feel a little lighter. I hope you know how much I love hearing that voice of yours, baby. ❤️", icon: "fa-comment-dots" },
+                { id: 6, title: "Sleepyhead", desc: "One of the moments I secretly love is whenever you fall asleep and I get to watch over you. I don't know, there's just something so peaceful about seeing you finally get some rest. Minsan I just find myself quietly looking at you, appreciating that little moment and wishing I could stay there a little longer. It makes me feel a kind of warmth na mahirap i-explain. I love seeing you at ease, knowing that for a little while, wala kang kailangang isipin or alalahanin. I just wish I could always be there beside you, making sure you're comfortable and safe while you sleep. ❤️", icon: "fa-moon" }
+            ],
+            letter: {
+                title: "A Letter About Why I Made This Little World for You",
+                greeting: "My Pau,",
+                paragraphs: [
+                    "I made this little website because I wanted to create something that you could keep. Something you could come back to whenever you feel like remembering the little things, even on ordinary days.",
+                    "I know I can't always be there beside you, and sometimes words alone don't feel like enough to express everything I want you to know. So I wanted to make something that could hold a little piece of what I feel, something more than just a message on your screen.",
+                    "I wanted a place where I could collect the things about you that I notice, the things you love, your little habits, the things that make you happy, and even the smallest details that might seem ordinary to everyone else but mean something to me.",
+                    "It's not about making something perfect. It's about making something that reminds you that you are appreciated, that the little things about you matter, and that someone took the time to put all of this together simply because you're worth it.",
+                    "Every page, every little detail, and every letter has a reason behind it. And that reason is you.",
+                    "I hope whenever you visit this little world, you feel a little loved, a little appreciated, and reminded that you matter."
+                ],
+                signoff: "With love,",
+                author: "Louie"
+            }
+        };
+
+        function initializeAndPreserveData() {
+            const storedAboutHer = localStorage.getItem('love_about_her_comprehensive');
+            if (storedAboutHer) {
+                try {
+                    const parsed = JSON.parse(storedAboutHer);
+                    aboutHerData = { ...defaultAboutHerData, ...parsed };
+                } catch(e) {
+                    console.error("Error parsing stored about her data, preserving default", e);
+                    aboutHerData = defaultAboutHerData;
+                }
+            } else {
+                aboutHerData = defaultAboutHerData;
+                localStorage.setItem('love_about_her_comprehensive', JSON.stringify(aboutHerData));
+            }
+        }
+
+        let aboutHerData;
+        initializeAndPreserveData();
+        let isAboutHerEditMode = false;
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getBirthdayCountdown() {
+            const now = new Date();
+            let year = now.getFullYear();
+            let bday = new Date(year, 4, 14);
+            if (now > bday) {
+                bday = new Date(year + 1, 4, 14);
+            }
+            const diffTime = bday - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return "Today is Pau's Birthday! Happy Birthday! 🎉";
+            return `${diffDays} days until Pau's Birthday (May 14) ♡`;
+        }
+
+        function openWelcomeEnvelope() {
+            const closed = document.getElementById('welcome-envelope-closed');
+            const opened = document.getElementById('welcome-envelope-opened');
+            if (closed) closed.classList.add('hidden');
+            if (opened) opened.classList.remove('hidden');
+        }
+
+        function revealFullWelcomeLetter() {
+            const overlay = document.getElementById('welcome-envelope-overlay');
+            if (overlay) overlay.classList.add('hidden');
+        }
+
+        function skipWelcomeLetter() {
+            const overlay = document.getElementById('welcome-envelope-overlay');
+            if (overlay) overlay.classList.add('hidden');
+        }
+
+        function renderAboutHer() {
+            const container = document.getElementById('about-her-container');
+            if (!container) return;
+            const isOwner = true;
+
+            let html = `
+                <!-- Decorative Scrapbook Header Accent -->
+                <div class="text-center space-y-2 relative pb-2">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-32 h-6 bg-emerald-500/15 border border-dashed border-emerald-500/30 rounded-sm rotate-1 flex items-center justify-center">
+                        <span class="text-[9px] uppercase tracking-widest font-bold text-emerald-700 dark:text-emerald-300">Chapter II ♡ Her World</span>
+                    </div>
+                    <div class="flex justify-center gap-3 text-rose-500 text-xs pt-4">
+                        <i class="fa-solid fa-star animate-pulse"></i>
+                        <i class="fa-solid fa-heart"></i>
+                        <i class="fa-solid fa-seedling text-emerald-500"></i>
+                    </div>
+                </div>
+
+                <!-- Main Polaroid Profile Card with layered scrapbook details -->
+                <div class="polaroid-card p-6 sm:p-10 rounded-3xl border space-y-6 relative overflow-hidden shadow-2xl">
+                    <div class="washi-tape-top flex items-center justify-center rounded-sm"></div>
+                    <div class="absolute top-4 right-4 text-rose-500/30 text-2xl font-cursive pointer-events-none rotate-6">"My favorite person"</div>
+                    <div class="absolute bottom-4 left-6 text-emerald-500/30 text-xl font-cursive pointer-events-none -rotate-3">Forever & Always ♡</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center pt-2">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="relative group">
+                                <div class="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden border-4 shadow-xl relative" style="border-color: var(--border-color); background: var(--input-bg);">
+                                    <img id="about-profile-preview-img" src="${escapeHtml(aboutHerData.profilePicture || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80')}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="absolute -bottom-2 right-2 wax-seal"><i class="fa-solid fa-heart text-xs"></i></div>
+                            </div>
+
+                            <div id="about-photo-controls" class="${isAboutHerEditMode ? 'flex' : 'hidden'} flex-wrap gap-2 justify-center w-full">
+                                <label class="px-4 py-2 rounded-full text-white font-bold text-xs shadow-md cursor-pointer transition-all hover:scale-105 flex items-center gap-1.5" style="background-color: var(--accent-green);">
+                                    <i class="fa-solid fa-upload"></i> Upload / Replace
+                                    <input type="file" accept="image/*" onchange="handleAboutProfilePhotoUpload(event)" class="hidden">
+                                </label>
+                                ${aboutHerData.profilePicture ? `
+                                    <button onclick="removeAboutProfilePhoto()" class="px-4 py-2 rounded-full border text-xs font-bold text-rose-500 hover:border-rose-400 transition-all">
+                                        <i class="fa-solid fa-trash mr-1"></i> Remove
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2 space-y-4 text-center md:text-left">
+                            <span class="text-xs font-bold uppercase tracking-widest text-emerald-500 flex items-center gap-1.5 justify-center md:justify-start">
+                                <i class="fa-solid fa-feather"></i> Dedicated Introduction
+                            </span>
+                            <h3 class="font-serif text-3xl sm:text-4xl font-bold">Pau</h3>
+                            
+                            <div id="about-intro-display" class="${isAboutHerEditMode ? 'hidden' : 'block'} space-y-3">
+                                <p class="font-serif italic text-base sm:text-lg themed-text-secondary leading-relaxed">
+                                    "${escapeHtml(aboutHerData.shortIntro || 'Dearest Pau, this is a little corner dedicated entirely to you...')}"
+                                </p>
+                                <div class="pt-2">
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-cursive border bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
+                                        ✨ Click any section below to discover little handwritten notes from Louie.
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div id="about-intro-edit" class="${isAboutHerEditMode ? 'block' : 'hidden'} space-y-3">
+                                <label class="block text-xs font-bold themed-text-secondary text-left">Edit Short Introduction *</label>
+                                <textarea id="about-intro-textarea" rows="4" class="w-full themed-input rounded-2xl p-4 focus:outline-none font-serif text-sm leading-relaxed">${escapeHtml(aboutHerData.shortIntro || '')}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scrapbook Divider -->
+                <div class="flex items-center justify-center gap-4 my-8">
+                    <div class="h-[1px] w-24 bg-emerald-500/30"></div>
+                    <span class="text-rose-500 text-sm"><i class="fa-solid fa-heart"></i></span>
+                    <div class="h-[1px] w-24 bg-emerald-500/30"></div>
+                </div>
+
+                <!-- Birthday Corner Card -->
+                <div class="glass-card p-6 sm:p-8 rounded-3xl border space-y-4 relative overflow-hidden shadow-xl">
+                    <div class="washi-tape-top flex items-center justify-center rounded-sm"></div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center border text-rose-500 shadow-sm" style="background: var(--bubble-1); border-color: var(--border-color);">
+                                <i class="fa-solid fa-cake-candles text-xl"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-rose-500 flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-[10px]"></i> Birthday Corner
+                                </span>
+                                <h3 class="font-serif text-2xl font-bold">May 14</h3>
+                            </div>
+                        </div>
+                        <div class="px-4 py-2 rounded-2xl border text-xs font-bold shadow-inner flex items-center gap-2" style="background: var(--bubble-2); border-color: var(--border-color); color: var(--accent-green);">
+                            <i class="fa-solid fa-hourglass-half"></i> <span id="bday-countdown-text">${escapeHtml(getBirthdayCountdown())}</span>
+                        </div>
+                    </div>
+                    <!-- Handwritten Secret Note Trigger -->
+                    <div class="pt-2 border-t border-dashed" style="border-color: var(--border-color);">
+                        <button onclick="toggleAboutSecret('bday-note')" class="text-xs font-cursive text-emerald-500 hover:underline flex items-center gap-1.5">
+                            <i class="fa-solid fa-seedling"></i> Note from Louie: "May 14 is the day the world received its brightest light. ♡" (Click to toggle)
+                        </button>
+                        <div id="bday-note" class="hidden mt-2 p-3 rounded-xl border bg-emerald-500/5 text-xs font-serif italic themed-text-secondary">
+                            "Every single day with you feels like celebrating your birthday. I am endlessly grateful you were born."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Her Little Favorites Section -->
+                <div class="space-y-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-widest text-emerald-500 flex items-center gap-1.5">
+                                <i class="fa-solid fa-star"></i> Personal Preferences <span class="font-cursive text-rose-500 text-sm">✨ Things Pau Loves</span>
+                            </span>
+                            <h3 class="font-serif text-2xl sm:text-3xl font-bold mt-1">Her Little Favorites</h3>
+                        </div>
+                        ${isOwner && isAboutHerEditMode ? `
+                            <button onclick="openAboutItemModal('favorites')" class="px-4 py-2 rounded-full border text-xs font-bold hover:border-emerald-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-plus text-xs"></i> Add Favorite Food
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <div class="glass-card p-6 rounded-3xl border space-y-3 relative overflow-hidden">
+                        <div class="washi-tape-top flex items-center justify-center rounded-sm"></div>
+                        <h4 class="font-serif text-lg font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-palette text-emerald-500"></i> Favorite Colors <span class="text-xs font-cursive themed-text-secondary">(Green, Red, Black)</span>
+                        </h4>
+                        <div class="flex flex-wrap gap-3">
+                            ${(aboutHerData.colors || []).map(col => `
+                                <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-bold shadow-sm" style="background: ${col.bg}; border-color: var(--border-color);">
+                                    <span class="w-3.5 h-3.5 rounded-full border border-white shadow-inner" style="background-color: ${col.hex};"></span>
+                                    <span>${escapeHtml(col.name)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${(aboutHerData.favorites || []).map(fav => {
+                            let itemIcon = fav.icon || 'fa-utensils';
+                            let lowerTitle = fav.title.toLowerCase();
+                            if (lowerTitle.includes('fries')) {
+                                itemIcon = 'fa-french-fries';
+                            } else if (lowerTitle.includes('pizza')) {
+                                itemIcon = 'fa-pizza-slice';
+                            } else if (lowerTitle.includes('ice cream')) {
+                                itemIcon = 'fa-ice-cream';
+                            } else if (lowerTitle.includes('bread') || lowerTitle.includes('loaf')) {
+                                itemIcon = 'fa-bread-slice';
+                            } else if (lowerTitle.includes('chicken')) {
+                                itemIcon = 'fa-drumstick-bite';
+                            } else if (lowerTitle.includes('sisig')) {
+                                itemIcon = 'fa-utensils';
+                            } else if (lowerTitle.includes('pasta')) {
+                                itemIcon = 'fa-bowl-food';
+                            }
+                            return `
+                            <div class="polaroid-card p-5 rounded-2xl border space-y-3 relative group hover:scale-[1.02] transition-transform">
+                                <div class="flex justify-between items-start">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center border text-emerald-500 shadow-inner" style="background: var(--bubble-1); border-color: var(--border-color);">
+                                        <i class="fa-solid ${escapeHtml(itemIcon)} text-base"></i>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-rose-500 text-[10px]"><i class="fa-solid fa-heart"></i></span>
+                                        ${isOwner && isAboutHerEditMode ? `
+                                            <button onclick="deleteAboutItem('favorites', ${fav.id})" class="text-rose-500 text-xs px-2 py-1 rounded hover:bg-rose-500/10" title="Remove item">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-serif text-lg font-bold">${escapeHtml(fav.title)}</h4>
+                                    <p class="themed-text-secondary text-xs sm:text-sm mt-1 leading-relaxed">${escapeHtml(fav.desc)}</p>
+                                </div>
+                            </div>
+                        `;}).join('')}
+                    </div>
+                </div>
+
+                <!-- Scrapbook Divider -->
+                <div class="flex items-center justify-center gap-4 my-8">
+                    <div class="h-[1px] w-24 bg-emerald-500/30"></div>
+                    <span class="text-emerald-500 text-sm"><i class="fa-solid fa-seedling"></i></span>
+                    <div class="h-[1px] w-24 bg-emerald-500/30"></div>
+                </div>
+
+                <!-- Perfect Day Card -->
+                <div class="glass-card p-6 sm:p-10 rounded-3xl border space-y-4 relative overflow-hidden shadow-xl">
+                    <div class="washi-tape-top flex items-center justify-center rounded-sm"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center border text-rose-500 shadow-sm" style="background: var(--bubble-1); border-color: var(--border-color);">
+                            <i class="fa-solid fa-sun text-lg"></i>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold">A Perfect Day for You</h3>
+                    </div>
+                    <p class="font-serif italic text-sm sm:text-base themed-text-secondary leading-relaxed p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/15">
+                        "One thing that makes you really happy is waking up and finding a written message waiting for you. You love having something to read as soon as you open your eyes. It's such a simple thing, but it can instantly make your day brighter."
+                    </p>
+                    <div class="text-right">
+                        <span class="font-cursive text-xs text-emerald-500">— Louie's gentle reminder</span>
+                    </div>
+                </div>
+
+                <!-- Passions & Pastimes Hobbies Section -->
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-widest text-emerald-500 flex items-center gap-1.5">
+                                <i class="fa-solid fa-feather"></i> Passions & Pastimes <span class="font-cursive text-rose-500 text-sm">✨ Creative Soul</span>
+                            </span>
+                            <h3 class="font-serif text-2xl sm:text-3xl font-bold mt-1">Your Hobbies and Interests</h3>
+                        </div>
+                        ${isOwner && isAboutHerEditMode ? `
+                            <button onclick="openAboutItemModal('hobbies')" class="px-4 py-2 rounded-full border text-xs font-bold hover:border-emerald-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-plus text-xs"></i> Add Hobby
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${(aboutHerData.hobbies || []).map(hobby => {
+                            let hobbyIcon = hobby.icon || 'fa-heart';
+                            let lowerHobby = hobby.title.toLowerCase();
+                            if (lowerHobby.includes('read')) hobbyIcon = 'fa-book-open-reader';
+                            else if (lowerHobby.includes('writ')) hobbyIcon = 'fa-pen-nib';
+                            else if (lowerHobby.includes('anim') || lowerHobby.includes('mov')) hobbyIcon = 'fa-clapperboard';
+                            else if (lowerHobby.includes('game')) hobbyIcon = 'fa-gamepad';
+                            else if (lowerHobby.includes('draw') || lowerHobby.includes('sketch')) hobbyIcon = 'fa-palette';
+                            else if (lowerHobby.includes('sing') || lowerHobby.includes('music')) hobbyIcon = 'fa-microphone-lines';
+
+                            return `
+                            <div class="glass-card p-5 rounded-2xl border space-y-3 hover:scale-[1.02] transition-transform shadow-lg relative">
+                                <div class="flex justify-between items-start">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center border text-emerald-500 shadow-inner" style="background: var(--bubble-2); border-color: var(--border-color);">
+                                        <i class="fa-solid ${escapeHtml(hobbyIcon)} text-base"></i>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-amber-500 text-[10px]"><i class="fa-solid fa-star"></i></span>
+                                        ${isOwner && isAboutHerEditMode ? `
+                                            <button onclick="deleteAboutItem('hobbies', ${hobby.id})" class="text-rose-500 text-xs px-2 py-1 rounded hover:bg-rose-500/10" title="Remove item">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-serif text-lg font-bold">${escapeHtml(hobby.title)}</h4>
+                                    <p class="themed-text-secondary text-xs sm:text-sm mt-1 leading-relaxed">${escapeHtml(hobby.desc)}</p>
+                                </div>
+                            </div>
+                        `;}).join('')}
+                    </div>
+                </div>
+
+                <!-- Scrapbook Divider -->
+                <div class="flex items-center justify-center gap-4 my-8">
+                    <div class="h-[1px] w-24 bg-emerald-500/30"></div>
+                    <span class="text-rose-500 text-sm"><i class="fa-solid fa-heart"></i></span>
+                    <div class="h-[1px] w-24 bg-emerald-500/30"></div>
+                </div>
+
+                <!-- Distinctive Expressions / Habits Section -->
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-widest text-emerald-500 flex items-center gap-1.5">
+                                <i class="fa-solid fa-face-smile text-rose-500"></i> Distinctive Expressions <span class="font-cursive text-emerald-500 text-sm">✨ Priceless Quirks</span>
+                            </span>
+                            <h3 class="font-serif text-2xl sm:text-3xl font-bold mt-1">Your Little Habits and Mannerisms</h3>
+                        </div>
+                        ${isOwner && isAboutHerEditMode ? `
+                            <button onclick="openAboutItemModal('littleThings')" class="px-4 py-2 rounded-full border text-xs font-bold hover:border-emerald-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-plus text-xs"></i> Add Habit
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        ${(aboutHerData.littleThings || []).map(item => {
+                            let itemIcon = item.icon || 'fa-heart';
+                            let lowerTitle = (item.title || '').toLowerCase();
+                            if (lowerTitle.includes('gasp')) itemIcon = 'fa-sparkles';
+                            else if (lowerTitle.includes('giggle')) itemIcon = 'fa-face-smile';
+                            else if (lowerTitle.includes('voice')) itemIcon = 'fa-comment-dots';
+                            else if (lowerTitle.includes('sleepy')) itemIcon = 'fa-moon';
+
+                            return `
+                            <div class="polaroid-card p-6 rounded-2xl border space-y-3 relative group hover:scale-[1.01] transition-transform">
+                                <div class="flex justify-between items-start">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs text-emerald-500 border border-emerald-500/30" style="background: var(--bubble-1);">
+                                        <i class="fa-solid ${escapeHtml(itemIcon)}"></i>
+                                    </div>
+                                    ${isOwner && isAboutHerEditMode ? `
+                                        <button onclick="deleteAboutItem('littleThings', ${item.id})" class="text-rose-500 text-xs px-2 py-1 rounded hover:bg-rose-500/10" title="Remove item">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                                <h4 class="font-serif text-xl font-bold text-emerald-500">${escapeHtml(item.title)}</h4>
+                                <p class="themed-text-secondary text-xs sm:text-sm leading-relaxed">${escapeHtml(item.desc)}</p>
+                            </div>
+                        `;}).join('')}
+                    </div>
+                </div>
+
+                <!-- Scrapbook Letter Section -->
+                <div class="glass-card p-8 sm:p-12 rounded-3xl border space-y-6 relative overflow-hidden shadow-2xl">
+                    <div class="washi-tape-top flex items-center justify-center rounded-sm"></div>
+                    
+                    <div id="about-letter-closed" class="text-center space-y-6 py-6">
+                        <div class="w-24 h-24 mx-auto rounded-3xl flex items-center justify-center border shadow-inner cursor-pointer hover:scale-105 transition-transform group relative" style="background: var(--bubble-1); border-color: var(--border-color);" onclick="openAboutHerLetter()">
+                            <div class="absolute -top-2 -right-2"><div class="wax-seal"><i class="fa-solid fa-heart text-xs"></i></div></div>
+                            <i class="fa-solid fa-envelope-open-text text-4xl group-hover:scale-110 transition-transform text-emerald-500"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="font-serif text-2xl font-bold">${escapeHtml(aboutHerData.letter.title)}</h3>
+                            <p class="themed-text-secondary text-xs">Tap the envelope to open Louie's heartfelt letter</p>
+                        </div>
+                    </div>
+
+                    <div id="about-letter-opened" class="hidden space-y-6 pt-2">
+                        <div class="flex items-center justify-between border-b pb-4" style="border-color: var(--border-color);">
+                            <div class="flex items-center gap-2">
+                                <div class="wax-seal w-7 h-7 text-xs"><i class="fa-solid fa-heart"></i></div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-emerald-500">A Letter About Why I Made This Little World for You</span>
+                            </div>
+                            <button onclick="closeAboutHerLetter()" class="text-xs themed-text-secondary hover:underline font-bold">
+                                <i class="fa-solid fa-xmark mr-1"></i> Close Letter
+                            </button>
+                        </div>
+
+                        <div class="font-serif text-sm sm:text-base leading-relaxed themed-text-secondary space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                            <p class="font-bold text-base text-emerald-500">${escapeHtml(aboutHerData.letter.greeting)}</p>
+                            ${(aboutHerData.letter.paragraphs || []).map(p => `<p>${escapeHtml(p)}</p>`).join('')}
+                            <div class="pt-4 space-y-1">
+                                <p class="italic">${escapeHtml(aboutHerData.letter.signoff)}</p>
+                                <p class="font-bold text-emerald-500 font-sans tracking-wide">${escapeHtml(aboutHerData.letter.author)}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function toggleAboutSecret(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        function toggleAboutHerEditMode() {
+            isAboutHerEditMode = !isAboutHerEditMode;
+            const editLabel = document.getElementById('about-edit-mode-label');
+            const saveActions = document.getElementById('about-save-actions');
+            if (isAboutHerEditMode) {
+                if (editLabel) editLabel.innerText = 'Exit Edit';
+                if (saveActions) saveActions.classList.remove('hidden');
+            } else {
+                if (editLabel) editLabel.innerText = 'Edit About Her';
+                if (saveActions) saveActions.classList.add('hidden');
+            }
+            renderAboutHer();
+        }
+
+        function handleAboutProfilePhotoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    aboutHerData.profilePicture = evt.target.result;
+                    const img = document.getElementById('about-profile-preview-img');
+                    if (img) img.src = evt.target.result;
+                    localStorage.setItem('love_about_her_comprehensive', JSON.stringify(aboutHerData));
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeAboutProfilePhoto() {
+            if (!confirm("Are you sure you want to remove Pau's picture?")) return;
+            aboutHerData.profilePicture = "";
+            localStorage.setItem('love_about_her_comprehensive', JSON.stringify(aboutHerData));
+            renderAboutHer();
+        }
+
+        function saveAboutHerChanges() {
+            const textarea = document.getElementById('about-intro-textarea');
+            if (textarea) {
+                aboutHerData.shortIntro = textarea.value;
+            }
+            localStorage.setItem('love_about_her_comprehensive', JSON.stringify(aboutHerData));
+            toggleAboutHerEditMode();
+        }
+
+        function cancelAboutHerEdits() {
+            isAboutHerEditMode = false;
+            aboutHerData = JSON.parse(localStorage.getItem('love_about_her_comprehensive')) || defaultAboutHerData;
+            const editLabel = document.getElementById('about-edit-mode-label');
+            const saveActions = document.getElementById('about-save-actions');
+            if (editLabel) editLabel.innerText = 'Edit About Her';
+            if (saveActions) saveActions.classList.add('hidden');
+            renderAboutHer();
+        }
+
+        function openAboutHerLetter() {
+            const closed = document.getElementById('about-letter-closed');
+            const opened = document.getElementById('about-letter-opened');
+            if (closed) closed.classList.add('hidden');
+            if (opened) opened.classList.remove('hidden');
+        }
+
+        function closeAboutHerLetter() {
+            const closed = document.getElementById('about-letter-closed');
+            const opened = document.getElementById('about-letter-opened');
+            if (closed) closed.classList.remove('hidden');
+            if (opened) opened.classList.add('hidden');
+        }
+
+        function openAboutItemModal(section) {
+            document.getElementById('about-item-section').value = section;
+            document.getElementById('about-item-id').value = '';
+            document.getElementById('about-item-title').value = '';
+            document.getElementById('about-item-desc').value = '';
+            document.getElementById('about-item-photo').value = '';
+            document.getElementById('about-modal-header').innerHTML = `<i class="fa-solid fa-plus"></i> Add New Detail to ${section}`;
+            document.getElementById('about-item-modal').classList.remove('hidden');
+        }
+
+        function closeAboutItemModal() {
+            document.getElementById('about-item-modal').classList.add('hidden');
+        }
+
+        function handleAboutItemPhotoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    document.getElementById('about-item-photo').value = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleSaveAboutItem(e) {
+            e.preventDefault();
+            const section = document.getElementById('about-item-section').value;
+            const title = document.getElementById('about-item-title').value;
+            const desc = document.getElementById('about-item-desc').value;
+            const photo = document.getElementById('about-item-photo').value;
+
+            const newItem = {
+                id: Date.now(),
+                title,
+                desc,
+                photo,
+                icon: section === 'favorites' ? 'fa-utensils' : (section === 'hobbies' ? 'fa-heart' : 'fa-seedling')
+            };
+
+            if (!aboutHerData[section]) {
+                aboutHerData[section] = [];
+            }
+            aboutHerData[section].push(newItem);
+
+            localStorage.setItem('love_about_her_comprehensive', JSON.stringify(aboutHerData));
+            closeAboutItemModal();
+            renderAboutHer();
+        }
+
+        function deleteAboutItem(section, id) {
+            if (!confirm("Are you sure you want to remove this entry?")) return;
+            if (aboutHerData[section]) {
+                aboutHerData[section] = aboutHerData[section].filter(i => i.id !== id);
+                localStorage.setItem('love_about_her_comprehensive', JSON.stringify(aboutHerData));
+                renderAboutHer();
+            }
+        }
+
+        function updateUserRoleUI() {
+            window.updateUserRoleUI();
+        }
+
+        function renderStoryPage() {
+            const grid = document.getElementById('story-entries-grid');
+            const countEl = document.getElementById('story-entry-count');
+            if (!grid) return;
+
+            let filtered = storyEntriesList;
+            if (activeStoryCategory !== 'All') {
+                filtered = storyEntriesList.filter(s => s.category === activeStoryCategory);
+            }
+
+            if (countEl) countEl.innerText = storyEntriesList.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 glass-card p-8 rounded-3xl border space-y-3">
+                        <i class="fa-solid fa-book-open text-4xl text-emerald-500 opacity-60"></i>
+                        <h3 class="font-serif text-2xl font-bold">No memories written here yet</h3>
+                        <p class="themed-text-secondary text-xs max-w-md mx-auto">This little storybook is waiting for Louie to fill it with your genuine memories, first calls, song moments, and sweet milestones.</p>
+                        ${currentUserRole === 'owner' ? `
+                            <button onclick="openStoryModal()" class="px-5 py-2.5 rounded-full text-white font-bold text-xs shadow-md mt-2" style="background-color: var(--accent-green);">
+                                <i class="fa-solid fa-plus mr-1"></i> Add First Memory
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                const isOwner = currentUserRole === 'owner';
+                const photoGridHtml = item.photos && item.photos.length > 0 ? `
+                    <div class="grid ${item.photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2 pt-2">
+                        ${item.photos.map(p => `
+                            <img src="${escapeHtml(p)}" class="w-full h-44 object-cover rounded-xl border border-emerald-500/20 shadow-sm">
+                        `).join('')}
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="polaroid-card p-6 rounded-3xl border space-y-4 relative flex flex-col justify-between shadow-xl">
+                        <div class="washi-tape-top flex items-center justify-center rounded-sm"></div>
+                        
+                        <div class="space-y-3 pt-2">
+                            <div class="flex justify-between items-start">
+                                <span class="text-[10px] uppercase font-bold px-3 py-1 rounded-full border shadow-sm" style="background: var(--bubble-1); border-color: var(--border-color); color: var(--accent-green);">
+                                    <i class="fa-solid fa-bookmark text-[9px] mr-1"></i> ${escapeHtml(item.category)}
+                                </span>
+                                <span class="text-xs font-serif italic themed-text-secondary">${escapeHtml(item.date || 'Special Memory')}</span>
+                            </div>
+
+                            <h3 class="font-serif text-2xl font-bold" style="color: var(--accent-green);">${escapeHtml(item.title)}</h3>
+                            
+                            <p class="themed-text-secondary text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-serif">${escapeHtml(item.desc)}</p>
+
+                            ${photoGridHtml}
+                        </div>
+
+                        ${isOwner ? `
+                            <div class="flex items-center justify-end gap-2 pt-4 border-t" style="border-color: var(--border-color);">
+                                <button onclick="openEditStoryModal(${item.id})" class="px-3.5 py-1.5 rounded-full border text-xs font-bold hover:border-emerald-400">
+                                    <i class="fa-solid fa-pen text-[10px] mr-1"></i> Edit
+                                </button>
+                                <button onclick="deleteStoryEntry(${item.id})" class="px-3.5 py-1.5 rounded-full border text-xs font-bold text-rose-500 hover:border-rose-400">
+                                    <i class="fa-solid fa-trash text-[10px] mr-1"></i> Delete
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterStoryCategory(cat) {
+            activeStoryCategory = cat;
+            ['All', 'How We Met', 'Our First Conversation', 'Our First Call', 'Our First Song', 'Our First Memories', 'Little Moments'].forEach(c => {
+                const btn = document.getElementById(`story-cat-${c}`);
+                if (btn) {
+                    if (c === cat) {
+                        btn.style.backgroundColor = 'var(--accent-green)';
+                        btn.style.color = '#ffffff';
+                    } else {
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                    }
+                }
+            });
+            renderStoryPage();
+        }
+
+        function openStoryModal() {
+            if (currentUserRole !== 'owner') return;
+            document.getElementById('story-entry-id').value = '';
+            document.getElementById('story-title-input').value = '';
+            document.getElementById('story-category-input').value = 'How We Met';
+            document.getElementById('story-date-input').value = '';
+            document.getElementById('story-desc-input').value = '';
+            pendingStoryPhotos = [];
+            document.getElementById('story-photos-preview').innerHTML = '';
+            document.getElementById('story-photos-preview').classList.add('hidden');
+            document.getElementById('story-modal-title').innerHTML = `<i class="fa-solid fa-book-sparkles"></i> Add Story Memory`;
+            document.getElementById('story-entry-modal').classList.remove('hidden');
+        }
+
+        function openEditStoryModal(id) {
+            if (currentUserRole !== 'owner') return;
+            const item = storyEntriesList.find(s => s.id === id);
+            if (!item) return;
+
+            document.getElementById('story-entry-id').value = item.id;
+            document.getElementById('story-title-input').value = item.title;
+            document.getElementById('story-category-input').value = item.category || 'How We Met';
+            document.getElementById('story-date-input').value = item.date || '';
+            document.getElementById('story-desc-input').value = item.desc || '';
+            pendingStoryPhotos = item.photos ? [...item.photos] : [];
+            
+            const container = document.getElementById('story-photos-preview');
+            container.innerHTML = '';
+            if (pendingStoryPhotos.length > 0) {
+                container.classList.remove('hidden');
+                pendingStoryPhotos.forEach(p => {
+                    const img = document.createElement('img');
+                    img.src = p;
+                    img.className = 'w-14 h-14 object-cover rounded-lg border';
+                    container.appendChild(img);
+                });
+            } else {
+                container.classList.add('hidden');
+            }
+
+            document.getElementById('story-modal-title').innerHTML = `<i class="fa-solid fa-pen"></i> Edit Story Memory`;
+            document.getElementById('story-entry-modal').classList.remove('hidden');
+        }
+
+        function closeStoryModal() {
+            document.getElementById('story-entry-modal').classList.add('hidden');
+        }
+
+        function handleStoryPhotoUpload(e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const container = document.getElementById('story-photos-preview');
+                container.classList.remove('hidden');
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        pendingStoryPhotos.push(evt.target.result);
+                        const img = document.createElement('img');
+                        img.src = evt.target.result;
+                        img.className = 'w-14 h-14 object-cover rounded-lg border';
+                        container.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function handleSaveStoryEntry(e) {
+            e.preventDefault();
+            if (currentUserRole !== 'owner') return;
+
+            const editId = document.getElementById('story-entry-id').value;
+            const title = document.getElementById('story-title-input').value.trim();
+            const category = document.getElementById('story-category-input').value;
+            const date = document.getElementById('story-date-input').value.trim();
+            const desc = document.getElementById('story-desc-input').value;
+
+            if (editId) {
+                const item = storyEntriesList.find(s => s.id == editId);
+                if (item) {
+                    item.title = title;
+                    item.category = category;
+                    item.date = date;
+                    item.desc = desc;
+                    item.photos = [...pendingStoryPhotos];
+                }
+            } else {
+                // Prevent duplicate addition if an identical title and date already exists
+                const existingDuplicate = storyEntriesList.find(s => s.title.trim().toLowerCase() === title.toLowerCase() && (s.date || '').trim().toLowerCase() === date.toLowerCase());
+                if (!existingDuplicate) {
+                    const newEntry = {
+                        id: Date.now(),
+                        title,
+                        category,
+                        date,
+                        desc,
+                        photos: [...pendingStoryPhotos],
+                        author: 'Louie'
+                    };
+                    storyEntriesList.unshift(newEntry);
+                }
+            }
+
+            localStorage.setItem('love_our_story_entries', JSON.stringify(storyEntriesList));
+            closeStoryModal();
+            renderStoryPage();
+        }
+
+        function deleteStoryEntry(id) {
+            if (currentUserRole !== 'owner') return;
+            if (!confirm("Are you sure you want to delete this story memory?")) return;
+
+            storyEntriesList = storyEntriesList.filter(s => s.id !== id);
+            localStorage.setItem('love_our_story_entries', JSON.stringify(storyEntriesList));
+            renderStoryPage();
+        }
+
+        function applyTheme(theme) {
+            currentTheme = theme;
+            localStorage.setItem('love_theme', theme);
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.getElementById('theme-toggle-icon').className = 'fa-solid fa-moon text-sm';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                document.getElementById('theme-toggle-icon').className = 'fa-solid fa-sun text-sm';
+            }
+        }
+
+        function toggleTheme() {
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function showSection(sectionId) {
+            const sections = ['home', 'about', 'story', 'letters', 'playlist'];
+            sections.forEach(s => {
+                const el = document.getElementById(`sec-${s}`);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(`sec-${sectionId}`);
+            if (target) {
+                target.classList.remove('hidden');
+                if (sectionId === 'about') renderAboutHer();
+                if (sectionId === 'story') renderStoryPage();
+                if (sectionId === 'letters') renderLetters();
+                if (sectionId === 'playlist') renderPlaylist();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderLetters() {
+            const grid = document.getElementById('letters-grid');
+            if (!grid) return;
+            
+            let list = lettersList;
+            if (activeLetterTab === 'unsent') list = unsentLettersList;
+            if (activeLetterTab === 'pau') list = pauLettersList;
+
+            grid.innerHTML = list.map(item => {
+                const isOwner = currentUserRole === 'owner';
+                const isPauTab = activeLetterTab === 'pau';
+                const canManage = isOwner || (isPauTab && currentUserName === 'Pau' && item.author === 'Pau');
+
+                return `
+                    <div class="glass-card p-6 rounded-2xl border space-y-3 relative flex flex-col justify-between">
+                        <div onclick="viewLetter(${item.id})" class="cursor-pointer space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--accent-green);">${escapeHtml(item.date)}</span>
+                                <span class="text-[10px] themed-text-secondary font-bold">By ${escapeHtml(item.author || 'Louie')}</span>
+                            </div>
+                            <h4 class="font-serif text-xl font-bold">${escapeHtml(item.title)}</h4>
+                            <p class="themed-text-secondary text-xs line-clamp-3 italic font-serif whitespace-pre-wrap">${escapeHtml(item.text)}</p>
+                        </div>
+                        ${canManage ? `
+                            <div class="flex items-center gap-2 pt-3 border-t mt-2" style="border-color: var(--border-color);">
+                                <button onclick="openEditLetterModal(${item.id})" class="px-3 py-1 rounded-full border text-[11px] font-bold hover:border-emerald-400">
+                                    <i class="fa-solid fa-pen text-[10px] mr-1"></i> Edit
+                                </button>
+                                <button onclick="deleteLetter(${item.id})" class="px-3 py-1 rounded-full border text-[11px] font-bold text-rose-500 hover:border-rose-400">
+                                    <i class="fa-solid fa-trash text-[10px] mr-1"></i> Delete
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchLetterTab(tab) {
+            activeLetterTab = tab;
+            ['letters', 'unsent', 'pau'].forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (btn) {
+                    if (t === tab) {
+                        btn.style.backgroundColor = 'var(--accent-green)';
+                        btn.style.color = '#ffffff';
+                    } else {
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                    }
+                }
+            });
+            renderLetters();
+        }
+
+        function openNewLetterModal() {
+            document.getElementById('letter-edit-id').value = '';
+            document.getElementById('letter-title-input').value = '';
+            document.getElementById('letter-date-input').value = 'Today';
+            document.getElementById('letter-text-input').value = '';
+            document.getElementById('compose-modal-title').innerHTML = '<i class="fa-solid fa-pen-nib"></i> Write a Love Letter';
+            document.getElementById('compose-letter-modal').classList.remove('hidden');
+        }
+
+        function closeComposeLetterModal() {
+            document.getElementById('compose-letter-modal').classList.add('hidden');
+        }
+
+        function openEditLetterModal(id) {
+            let list = lettersList;
+            if (activeLetterTab === 'unsent') list = unsentLettersList;
+            if (activeLetterTab === 'pau') list = pauLettersList;
+
+            const item = list.find(l => l.id === id);
+            if (!item) return;
+
+            document.getElementById('letter-edit-id').value = item.id;
+            document.getElementById('letter-title-input').value = item.title;
+            document.getElementById('letter-date-input').value = item.date;
+            document.getElementById('letter-text-input').value = item.text;
+            document.getElementById('compose-modal-title').innerHTML = '<i class="fa-solid fa-pen"></i> Edit Love Letter';
+            document.getElementById('compose-letter-modal').classList.remove('hidden');
+        }
+
+        function handleSaveLetterForm(e) {
+            e.preventDefault();
+            const editId = document.getElementById('letter-edit-id').value;
+            const title = document.getElementById('letter-title-input').value;
+            const date = document.getElementById('letter-date-input').value || 'Today';
+            const text = document.getElementById('letter-text-input').value;
+
+            let list = lettersList;
+            let storageKey = 'love_letters';
+            if (activeLetterTab === 'unsent') {
+                list = unsentLettersList;
+                storageKey = 'love_unsent_letters';
+            } else if (activeLetterTab === 'pau') {
+                list = pauLettersList;
+                storageKey = 'love_pau_letters';
+            }
+
+            if (editId) {
+                const item = list.find(l => l.id == editId);
+                if (item) {
+                    item.title = title;
+                    item.date = date;
+                    item.text = text;
+                }
+            } else {
+                const newLetter = {
+                    id: Date.now(),
+                    title,
+                    date,
+                    text,
+                    author: (activeLetterTab === 'pau' ? 'Pau' : currentUserName)
+                };
+                list.push(newLetter);
+            }
+
+            localStorage.setItem(storageKey, JSON.stringify(list));
+            closeComposeLetterModal();
+            renderLetters();
+        }
+
+        function deleteLetter(id) {
+            if (!confirm("Are you sure you want to delete this letter?")) return;
+
+            let list = lettersList;
+            let storageKey = 'love_letters';
+            if (activeLetterTab === 'unsent') {
+                list = unsentLettersList;
+                storageKey = 'love_unsent_letters';
+            } else if (activeLetterTab === 'pau') {
+                list = pauLettersList;
+                storageKey = 'love_pau_letters';
+            }
+
+            const idx = list.findIndex(l => l.id === id);
+            if (idx !== -1) {
+                list.splice(idx, 1);
+                localStorage.setItem(storageKey, JSON.stringify(list));
+                renderLetters();
+            }
+        }
+
+        function viewLetter(id) {
+            let item = lettersList.find(l => l.id === id) || unsentLettersList.find(l => l.id === id) || pauLettersList.find(l => l.id === id);
+            if (!item) return;
+            const modal = document.getElementById('letter-modal');
+            const content = document.getElementById('letter-modal-content');
+            if (content) {
+                content.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b pb-2" style="border-color: var(--border-color);">
+                            <h3 class="font-serif text-2xl font-bold" style="color: var(--accent-green);">${escapeHtml(item.title)}</h3>
+                            <span class="text-xs themed-text-secondary">${escapeHtml(item.date)}</span>
+                        </div>
+                        <p class="font-mono text-sm leading-relaxed p-4 rounded-xl bg-slate-900/40 border border-emerald-500/20 whitespace-pre-wrap">${escapeHtml(item.text)}</p>
+                        <p class="font-serif italic text-right text-xs text-emerald-400">With love, ${escapeHtml(item.author || 'Louie')}</p>
+                    </div>
+                `;
+            }
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeLetterModal() {
+            const modal = document.getElementById('letter-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function extractSpotifyTrackId(url) {
+            if (!url) return null;
+            const match = url.match(/(?:track\/|track:)([a-zA-Z0-9]{22})/);
+            return match ? match[1] : null;
+        }
+
+        function filterPlaylistCategory(cat) {
+            activePlaylistCategory = cat;
+            ['All', 'The Firsts', 'You Remind Me of This', 'Songs I Want You to Hear'].forEach(c => {
+                const btn = document.getElementById(`playlist-cat-${c}`);
+                if (btn) {
+                    if (c === cat) {
+                        btn.style.backgroundColor = 'var(--accent-green)';
+                        btn.style.color = '#ffffff';
+                    } else {
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                    }
+                }
+            });
+            renderPlaylist();
+        }
+
+        function renderPlaylist() {
+            const container = document.getElementById('playlist-container');
+            if (!container) return;
+
+            let filtered = songsList;
+            if (activePlaylistCategory !== 'All') {
+                filtered = songsList.filter(s => (s.section || 'The Firsts') === activePlaylistCategory);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 glass-card rounded-3xl p-8 themed-text-secondary">
+                        <i class="fa-brands fa-spotify text-4xl text-emerald-500 mb-2"></i>
+                        <p class="font-serif text-lg font-bold">No songs found in this category.</p>
+                        <p class="text-xs mt-1">Add favorite tracks using the button above.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(song => {
+                const trackId = extractSpotifyTrackId(song.spotifyUrl);
+                const canManage = true;
+
+                return `
+                    <div class="glass-card p-5 rounded-3xl border space-y-4 shadow-xl relative overflow-hidden flex flex-col justify-between hover:scale-[1.01] transition-all">
+                        <div class="washi-tape-top flex items-center justify-center rounded-sm"></div>
+                        
+                        <div class="space-y-3 pt-2">
+                            <div class="flex items-center justify-between border-b pb-2" style="border-color: var(--border-color);">
+                                <span class="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full border shadow-sm" style="background: var(--bubble-1); border-color: var(--border-color); color: var(--accent-green);">
+                                    <i class="fa-solid fa-music text-[9px] mr-1"></i> ${escapeHtml(song.section || 'The Firsts')}
+                                </span>
+                                <span class="text-[10px] themed-text-secondary font-bold">By ${escapeHtml(song.addedBy || 'Louie')}</span>
+                            </div>
+
+                            <div>
+                                <h4 class="font-serif text-lg font-bold text-emerald-500 line-clamp-1">${escapeHtml(song.title)}</h4>
+                                <p class="themed-text-secondary text-xs font-medium"><i class="fa-solid fa-microphone text-[10px] mr-1"></i>${escapeHtml(song.artist)}</p>
+                            </div>
+
+                            ${song.note ? `
+                                <p class="text-xs italic font-serif themed-text-secondary p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/15 line-clamp-2">
+                                    "${escapeHtml(song.note)}"
+                                </p>
+                            ` : ''}
+
+                            <div class="pt-1">
+                                ${trackId ? `
+                                    <div class="rounded-2xl overflow-hidden border shadow-inner bg-slate-900/40" style="border-color: var(--border-color);">
+                                        <iframe src="https://open.spotify.com/embed/track/${escapeHtml(trackId)}?utm_source=generator&theme=0" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                                    </div>
+                                ` : `
+                                    <div class="p-3 rounded-2xl border text-center space-y-1 bg-slate-900/30" style="border-color: var(--border-color);">
+                                        <p class="text-[11px] text-amber-500 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Preview Unavailable</p>
+                                        ${song.spotifyUrl ? `
+                                            <a href="${escapeHtml(song.spotifyUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#1DB954] hover:bg-[#1ed760] transition-colors shadow-sm">
+                                                <i class="fa-brands fa-spotify"></i> Open Track in Spotify
+                                            </a>
+                                        ` : ''}
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+
+                        ${canManage ? `
+                            <div class="flex items-center justify-end gap-2 pt-3 border-t mt-2" style="border-color: var(--border-color);">
+                                <button type="button" onclick="event.stopPropagation(); openEditSongModal(${song.id})" class="px-3 py-1 rounded-full border text-[11px] font-bold hover:border-emerald-400 cursor-pointer">
+                                    <i class="fa-solid fa-pen text-[10px] mr-1"></i> Edit
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); deleteSong(${song.id})" class="px-3 py-1 rounded-full border text-[11px] font-bold text-rose-500 hover:border-rose-400 cursor-pointer">
+                                    <i class="fa-solid fa-trash text-[10px] mr-1"></i> Delete
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openAddSongModal() {
+            document.getElementById('song-edit-id').value = '';
+            document.getElementById('song-title-input').value = '';
+            document.getElementById('song-artist-input').value = '';
+            document.getElementById('song-section-input').value = activePlaylistCategory !== 'All' ? activePlaylistCategory : 'The Firsts';
+            document.getElementById('song-spotify-input').value = '';
+            document.getElementById('song-note-input').value = '';
+            document.getElementById('song-modal-title').innerHTML = '<i class="fa-solid fa-music"></i> Add Song to Playlist';
+            document.getElementById('add-song-modal').classList.remove('hidden');
+        }
+
+        function openEditSongModal(id) {
+            const song = songsList.find(s => s.id === id);
+            if (!song) return;
+
+            document.getElementById('song-edit-id').value = song.id;
+            document.getElementById('song-title-input').value = song.title;
+            document.getElementById('song-artist-input').value = song.artist;
+            document.getElementById('song-section-input').value = song.section || 'The Firsts';
+            document.getElementById('song-spotify-input').value = song.spotifyUrl || '';
+            document.getElementById('song-note-input').value = song.note || '';
+            document.getElementById('song-modal-title').innerHTML = '<i class="fa-solid fa-pen"></i> Edit Song Entry';
+            document.getElementById('add-song-modal').classList.remove('hidden');
+        }
+
+        function closeAddSongModal() {
+            document.getElementById('add-song-modal').classList.add('hidden');
+        }
+
+        function handleSaveSong(e) {
+            e.preventDefault();
+            const editId = document.getElementById('song-edit-id').value;
+            const title = document.getElementById('song-title-input').value;
+            const artist = document.getElementById('song-artist-input').value;
+            const section = document.getElementById('song-section-input').value;
+            const spotifyUrl = document.getElementById('song-spotify-input').value;
+            const note = document.getElementById('song-note-input').value;
+
+            if (editId) {
+                const songIdx = songsList.findIndex(s => s.id == editId);
+                if (songIdx !== -1) {
+                    const song = songsList[songIdx];
+                    songsList[songIdx] = {
+                        ...song,
+                        title,
+                        artist,
+                        section,
+                        spotifyUrl,
+                        note
+                    };
+                }
+            } else {
+                songsList.unshift({
+                    id: Date.now(),
+                    title,
+                    artist,
+                    section,
+                    spotifyUrl,
+                    note,
+                    addedBy: currentUserName
+                });
+            }
+
+            localStorage.setItem('love_playlist', JSON.stringify(songsList));
+            closeAddSongModal();
+            renderPlaylist();
+        }
+
+        function deleteSong(id) {
+            const song = songsList.find(s => s.id === id);
+            if (!song) return;
+
+            if (!confirm(`Are you sure you want to delete "${song.title}"?`)) return;
+
+            songsList = songsList.filter(s => s.id !== id);
+            localStorage.setItem('love_playlist', JSON.stringify(songsList));
+            renderPlaylist();
+        }
+
+        function triggerEnterWorld() {
+            showSection('about');
+        }
+
+        function toggleSecretNote() {
+            const note = document.getElementById('home-secret-note');
+            if (note) note.classList.toggle('hidden');
+        }
+
+        /* --- INITIALIZATION --- */
+        window.onload = function() {
+            applyTheme(currentTheme);
+            initializeAndPreserveData();
+            renderAboutHer();
+            renderStoryPage();
+            renderLetters();
+            initLoveLetterAudioPlayer();
+            filterPlaylistCategory('All');
+            renderPlaylist();
+            switchLetterTab('letters');
+            filterStoryCategory('All');
+            updateUserRoleUI();
+            
+            const loginModal = document.getElementById('user-login-modal');
+            if (loginModal) loginModal.classList.remove('hidden');
+        };
+    </script>
+</body>
+</html>
